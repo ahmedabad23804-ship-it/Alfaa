@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>المدرسين | FULL MARK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { 
+            background-color: #020617; color: white; font-family: 'Tajawal', sans-serif; 
+            min-height: 100vh; overflow-x: hidden;
+        }
+
+        .bg-glow {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
+            background: radial-gradient(circle at 50% -10%, #1e1b4b, #020617 70%);
+        }
+
+        .pro-card {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(99, 102, 241, 0.15);
+            backdrop-filter: blur(20px);
+            border-radius: 28px;
+            padding: 35px 20px;
+            display: flex; flex-direction: column; align-items: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative; overflow: hidden;
+        }
+
+        .pro-card:hover {
+            transform: translateY(-12px);
+            background: rgba(30, 41, 59, 0.6);
+            border-color: #6366f1;
+            box-shadow: 0 25px 50px -12px rgba(99, 102, 241, 0.25);
+        }
+
+        .img-ring {
+            width: 120px; height: 120px;
+            border-radius: 50%;
+            padding: 4px;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #d946ef);
+            box-shadow: 0 0 25px rgba(99, 102, 241, 0.3);
+            margin-bottom: 22px;
+            transition: 0.5s;
+        }
+        .pro-card:hover .img-ring { transform: rotate(5deg) scale(1.05); box-shadow: 0 0 35px rgba(217, 70, 239, 0.5); }
+
+        .teacher-img {
+            width: 100%; height: 100%; border-radius: 50%;
+            object-fit: cover; border: 4px solid #0f172a;
+            background: #1e293b;
+        }
+
+        .t-name { font-size: 1.5rem; font-weight: 800; color: white; margin-bottom: 8px; text-align: center; }
+        
+        .info-badge {
+            background: rgba(99, 102, 241, 0.1); color: #c7d2fe;
+            padding: 8px 18px; border-radius: 50px; font-size: 0.8rem;
+            font-weight: bold; border: 1px solid rgba(99, 102, 241, 0.2);
+            display: flex; align-items: center; gap: 8px;
+        }
+
+        .arrow-btn {
+            position: absolute; bottom: 20px; left: 20px;
+            width: 45px; height: 45px; border-radius: 18px;
+            background: linear-gradient(135deg, #6366f1, #a855f7); 
+            color: white; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transform: translateX(20px); transition: 0.4s;
+            box-shadow: 0 10px 15px rgba(99, 102, 241, 0.3);
+        }
+        .pro-card:hover .arrow-btn { opacity: 1; transform: translateX(0); }
+        
+        .branding {
+            position: fixed; bottom: 20px; right: 20px; opacity: 0.4; font-weight: 900; letter-spacing: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <div id="app" class="p-6 max-w-7xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <div class="flex items-center gap-5">
+                <button onclick="window.history.back()" class="w-14 h-14 bg-white/5 border border-white/10 rounded-2xl text-white hover:bg-white/10 transition-all flex items-center justify-center group">
+                    <i class="fas fa-chevron-right text-lg group-hover:translate-x-1 transition-transform"></i>
+                </button>
+                <div>
+                    <h1 class="text-4xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-l from-white via-indigo-200 to-indigo-400">
+                        نخبة FULL MARK
+                    </h1>
+                    <p class="text-gray-400 text-sm mt-1 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-indigo-500 rounded-full animate-ping"></span>
+                        اختر معلمك المفضل للبدء في المشاهدة
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-for="i in 3" :key="i" class="pro-card animate-pulse h-72 bg-white/5"></div>
+        </div>
+
+        <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div v-for="t in teachers" :key="t.id" @click="go(t)" class="pro-card cursor-pointer group">
+                
+                <div class="img-ring">
+                    <img :src="t.image_url || 'https://cdn-icons-png.flaticon.com/512/3135/3135715.png'" 
+                         class="teacher-img" 
+                         onerror="this.src='https://cdn-icons-png.flaticon.com/512/3135/3135715.png'">
+                </div>
+
+                <h2 class="t-name group-hover:text-indigo-400 transition-colors">{{ t.name }}</h2>
+                
+                <div class="info-badge">
+                    <i class="fas fa-play-circle text-indigo-400"></i>
+                    <span>{{ getTotalContent(t) }} محتوى متاح</span>
+                </div>
+
+                <div class="arrow-btn">
+                    <i class="fas fa-arrow-left"></i>
+                </div>
+            </div>
+        </div>
+        
+        <div v-if="!loading && teachers.length === 0" class="text-center py-32 border-2 border-dashed border-white/5 rounded-[40px]">
+            <div class="bg-indigo-500/10 w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                <i class="fas fa-user-tie text-4xl text-indigo-500 opacity-50"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-300">لم يتم إضافة مدرسين</h3>
+            <p class="text-gray-500 mt-2">سيتم إضافة المحتوى التعليمي لهذه المادة قريباً</p>
+        </div>
+
+        <div class="branding text-xs uppercase text-indigo-500 hidden md:block">
+            ELGIZAWY
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        const URLS = {
+            'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
+            'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+            'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json",
+            'أزهر': "https://plus-teal.vercel.app/organized_output.json"
+        };
+
+        createApp({
+            setup() {
+                const teachers = ref([]);
+                const loading = ref(true);
+                const params = new URLSearchParams(window.location.search);
+
+                const go = (t) => {
+                    const yid = params.get('yid');
+                    const sid = params.get('sid');
+                    window.location.href = `lectures.html?yid=${yid}&sid=${sid}&tid=${t.id}`;
+                };
+
+                const getTotalContent = (t) => {
+                    // حساب مجموع المحتوى (وحدات أو فصول أو محاضرات)
+                    let count = 0;
+                    if(t.units) count += t.units.length;
+                    if(t.chapters) count += t.chapters.length;
+                    // إذا لم يكن هناك وحدات/فصول، قد تكون المحاضرات مباشرة في المعلم
+                    if(count === 0 && t.lectures) count = t.lectures.length;
+                    return count;
+                };
+
+                onMounted(async () => {
+                    const code = typeof checkAuth === 'function' ? checkAuth() : localStorage.getItem('alpha_user_code');
+                    
+                    if(!code) {
+                        window.location.href = 'index.html';
+                        return;
+                    }
+
+                    const db = firebase.database();
+                    try {
+                        const snap = await db.ref('approvedStudents/' + code).once('value');
+                        const user = snap.val();
+
+                        if(!user) throw new Error("User not found");
+
+                        const targetURL = URLS[user.section] || URLS['علمي علوم'];
+                        const res = await fetch(targetURL);
+                        const data = await res.json();
+                        
+                        // البحث عن السنة الدراسية المختارة
+                        const year = data.find(y => y.id == params.get('yid'));
+                        if (year) {
+                            // البحث عن المادة المختارة داخل تلك السنة
+                            const sub = year.subjects.find(s => s.id == params.get('sid'));
+                            if (sub) {
+                                teachers.value = sub.teachers || [];
+                            }
+                        }
+                    } catch(e) { 
+                        console.error("Error loading teachers:", e);
+                    } finally { 
+                        loading.value = false; 
+                    }
+                });
+
+                return { teachers, loading, go, getTotalContent };
+            }
+        }).mount('#app');
+    </script>
+</body>
+          </html>
+          
