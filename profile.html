@@ -3,63 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الملف الشخصي</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="auth.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <style>
-        body { background: #020617; color: white; font-family: 'Tajawal', sans-serif; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .glass-card { background: rgba(30, 41, 59, 0.4); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 30px; padding: 40px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        .avatar-ring { width: 100px; height: 100px; margin: 0 auto 20px; border-radius: 50%; padding: 3px; background: linear-gradient(135deg, #6366f1, #d946ef); }
-        .avatar-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid #0f172a; }
-        .info-item { background: rgba(255, 255, 255, 0.03); padding: 15px; border-radius: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255, 255, 255, 0.05); }
-    </style>
+    <title>نظام FULL MARK | الصفحة الشخصية</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div class="background-overlay"></div>
 
-    <div class="glass-card relative">
-        <button onclick="history.back()" class="absolute top-6 right-6 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
-
-        <div class="avatar-ring">
-            <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" class="avatar-img">
+    <header>
+        <div class="user-info">
+            <img src="user-avatar.png" alt="صورة المستخدم" class="user-avatar">
+            <div class="user-details">
+                <h1>احمد محمد</h1>
+                <span class="user-title">🎓 بطل الـ FULL MARK</span>
+            </div>
         </div>
-
-        <h1 id="pName" class="text-2xl font-black mb-1">...</h1>
-        <p id="pSection" class="text-indigo-400 text-sm font-bold mb-8">...</p>
-
-        <div class="info-item">
-            <span class="text-gray-400 text-sm"><i class="fas fa-id-card ml-2"></i>كود الطالب</span>
-            <span id="pCode" class="font-mono font-bold tracking-widest">...</span>
+        <div class="header-buttons">
+            <button class="crown-btn">👑</button>
+            <button class="power-btn">⏻</button>
         </div>
+    </header>
 
-        <div class="info-item">
-            <span class="text-gray-400 text-sm"><i class="fas fa-calendar-alt ml-2"></i>تاريخ الانتهاء</span>
-            <span id="pDate" class="font-bold text-green-400">...</span>
+    <main>
+        <h2 class="main-title">نظام FULL MARK</h2>
+        <p class="subtitle">مسارك للتفوق</p>
+
+        <div class="subjects-grid">
+            <div class="subject-card arabic">
+                <div class="card-content">
+                    <h3>لغة عربية</h3>
+                    <span class="teachers-count">👨‍🏫 2 معلمين</span>
+                </div>
+            </div>
+
+            <div class="subject-card english">
+                <div class="card-content">
+                    <h3>English</h3>
+                    <span class="teachers-count">👨‍🏫 5 معلمين</span>
+                </div>
+            </div>
+
+            <div class="subject-card physics">
+                <div class="card-content">
+                    <h3>فيزياء</h3>
+                    <span class="teachers-count">👨‍🏫 4 معلمين</span>
+                </div>
+            </div>
+
+            <div class="subject-card chemistry">
+                <div class="card-content">
+                    <h3>كيمياء</h3>
+                    <span class="teachers-count">👨‍🏫 5 معلمين</span>
+                </div>
+            </div>
         </div>
+    </main>
 
-        <button onclick="logout()" class="w-full mt-6 py-4 rounded-xl bg-red-500/10 text-red-500 font-bold border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2">
-            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-        </button>
-    </div>
-
-    <script>
-        const code = checkAuth();
-        if(!code) window.location.href = 'index.html';
-
-        const db = firebase.database();
-        db.ref('approvedStudents/'+code).once('value', snap => {
-            const u = snap.val();
-            if(u) {
-                document.getElementById('pName').innerText = u.studentName;
-                document.getElementById('pSection').innerText = u.section;
-                document.getElementById('pCode').innerText = code;
-                document.getElementById('pDate').innerText = new Date(u.expiryDate).toLocaleDateString('ar-EG');
-            }
-        });
-    </script>
+    <footer>
+        ELGIZAWY DEVELOPMENT
+    </footer>
 </body>
 </html>
