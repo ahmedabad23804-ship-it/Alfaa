@@ -17,22 +17,65 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 }
 
 /**
- * دالة التحقق من الدخول
- * تستخدم في بداية كل صفحة (ماعدا صفحة الدخول)
+ * دالة التحقق من الصلاحيات والحظر (Core Security)
+ * تعمل بشكل تلقائي في كل الصفحات
  */
 function checkAuth() {
     const code = localStorage.getItem('alpha_user_code');
-    const isLoginPage = window.location.pathname.endsWith('index.html') || window.location.pathname === '/';
+    
+    // تحديد اسم الصفحة الحالية
+    const path = window.location.pathname;
+    const pageName = path.substring(path.lastIndexOf('/') + 1);
+    const isLoginPage = (pageName === 'index.html' || pageName === '');
+    const isBlockedPage = (pageName === 'blocked.html');
 
-    // إذا لم يوجد كود والمستخدم ليس في صفحة الدخول
-    if (!code && !isLoginPage) {
-        window.location.replace('index.html'); // استخدام replace لمنع الرجوع للخلف
+    // 1. حالة عدم وجود كود مسجل
+    if (!code) {
+        if (!isLoginPage) {
+            window.location.replace('index.html');
+        }
         return null;
     }
-    
-    // إذا وجد الكود والمستخدم يحاول دخول صفحة الدخول (اختياري: توجيهه للرئيسية)
-    if (code && isLoginPage) {
-        // window.location.href = 'dashboard.html'; // يمكنك تفعيلها إذا أردت
+
+    // 2. التحقق الأمني من قاعدة البيانات (Real-time Listener)
+    if (typeof firebase !== 'undefined') {
+        const db = firebase.database();
+        
+        // استخدام .on بدلاً من .once لمراقبة الحظر لحظياً
+        db.ref('approvedStudents/' + code).on('value', (snapshot) => {
+            const user = snapshot.val();
+
+            // أ: الكود غير موجود في قاعدة البيانات (تم حذفه)
+            if (!user) {
+                localStorage.clear();
+                window.location.replace('index.html');
+                return;
+            }
+
+            // ب: التحقق من الحظر
+            if (user.isBlocked === true) {
+                // حفظ الاسم لعرضه في صفحة الحظر
+                localStorage.setItem('studentName', user.studentName);
+                
+                // لو الطالب مش في صفحة الحظر -> اطرده لصفحة الحظر فوراً
+                if (!isBlockedPage) {
+                    window.location.replace('blocked.html');
+                }
+            } 
+            else {
+                // ج: الطالب سليم (غير محظور)
+                
+                // لو كان في صفحة الحظر (وتم فك الحظر عنه) -> رجعه للمواد
+                if (isBlockedPage) {
+                    window.location.replace('subjects.html');
+                }
+                
+                // لو حاول يدخل صفحة التسجيل وهو مسجل أصلاً -> دخله للمواد
+                if (isLoginPage) {
+                    window.location.replace('subjects.html');
+                }
+            }
+        });
     }
 
     return code;
@@ -43,12 +86,16 @@ function checkAuth() {
  */
 function logout() {
     if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-        // مسح كود الدخول
+        // مسح كود الدخول والبيانات المؤقتة
         localStorage.removeItem('alpha_user_code');
+        localStorage.removeItem('studentName');
+        localStorage.removeItem('activeLecture');
+        
         // توجيه فوري لصفحة الدخول
         window.location.replace('index.html');
     }
 }
 
-// تشغيل الفحص تلقائياً عند تحميل السكريبت
+// تشغيل نظام الحماية تلقائياً عند تحميل الملف
 checkAuth();
+    
