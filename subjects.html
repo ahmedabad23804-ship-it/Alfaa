@@ -112,10 +112,10 @@
                 </div>
             </div>
 
-            <div class="flex gap-3">
-                <a href="status.html" class="w-10 h-10 rounded-xl bg-slate-800/50 flex items-center justify-center text-yellow-400 border border-white/10 hover:bg-yellow-500/20 hover:border-yellow-500/50 transition">
-                    <i class="fas fa-crown"></i>
-                </a>
+            <div>
+                <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 hover:bg-red-500 hover:text-white transition shadow-lg">
+                    <i class="fas fa-power-off text-sm"></i>
+                </button>
             </div>
         </header>
 
@@ -182,7 +182,7 @@
                     window.location.href = `teachers.html?yid=${yid.value}&sid=${s.id}`;
                 };
 
-                // أيقونات المواد (صور شفافة عالية الجودة)
+                // أيقونات المواد
                 const getImage = (name) => {
                     const n = name.toLowerCase();
                     if(n.includes('english') || n.includes('إنجليزي')) return 'https://cdn-icons-png.flaticon.com/512/3269/3269817.png';
