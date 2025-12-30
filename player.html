@@ -33,7 +33,7 @@
             padding-top: 60px !important;
         }
 
-        /* ==================== طبقة التحكم ==================== */
+        /* طبقة التحكم */
         .yt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 50; 
@@ -62,51 +62,31 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
         }
 
-        /* حاوية الأزرار في المنتصف */
+        /* زر التشغيل في المنتصف */
         .center-controls {
-            display: flex; align-items: center; justify-content: center; gap: 30px;
+            display: flex; align-items: center; justify-content: center;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 100%;
         }
 
-        /* تصميم الزراير (الموبايل هو الأساس) */
-        .yt-btn {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6); color: white; border: 1px solid rgba(255,255,255,0.1);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.1rem; cursor: pointer; backdrop-filter: blur(5px);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-        }
-        .yt-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
-
         .yt-play-big {
-            width: 70px; height: 70px; font-size: 2rem;
-            background: rgba(0, 0, 0, 0.7);
+            width: 80px; height: 80px; font-size: 2.5rem; border-radius: 50%;
+            background: rgba(0, 0, 0, 0.7); color: white;
             border: 2px solid rgba(255,255,255,0.2);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(5px);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
+        .yt-play-big:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
 
-        /* 💻 تحسينات للشاشات الكبيرة (Tablet & Laptop) 💻 */
+        /* 💻 تحسينات للشاشات الكبيرة 💻 */
         @media (min-width: 768px) {
-            /* تكبير الزراير */
-            .yt-btn { width: 65px; height: 65px; font-size: 1.4rem; gap: 50px; }
-            .yt-play-big { width: 90px; height: 90px; font-size: 3rem; }
-            
-            /* تكبير العنوان */
+            .yt-play-big { width: 100px; height: 100px; font-size: 3.5rem; }
             .video-title { font-size: 1.3rem; max-width: 80%; }
             .yt-header { padding: 30px; }
-
-            /* تأثيرات الماوس (Hover) للاب توب */
-            .yt-btn:hover { 
-                background: white; color: black; 
-                transform: scale(1.1); border-color: white; 
-            }
-            .yt-play-big:hover {
-                background: #ff0000; color: white; border-color: #ff0000;
-            }
+            .yt-play-big:hover { background: #ff0000; color: white; border-color: #ff0000; transform: scale(1.1); }
         }
 
-        /* العلامة المائية */
         .watermark {
             position: absolute; bottom: 80px; right: 20px;
             font-size: 0.9rem; color: rgba(255,255,255,0.3);
@@ -131,18 +111,8 @@
             </div>
 
             <div class="center-controls">
-                <button id="btnRewind" class="yt-btn group">
-                    <i class="fas fa-undo-alt"></i>
-                    <span class="absolute mt-8 text-[10px] font-bold opacity-70 group-hover:opacity-100 group-hover:text-black">10</span>
-                </button>
-
-                <button id="btnPlayPause" class="yt-btn yt-play-big">
+                <button id="btnPlayPause" class="yt-play-big">
                     <i class="fas fa-play ml-1" id="iconPlay"></i>
-                </button>
-
-                <button id="btnForward" class="yt-btn group">
-                    <i class="fas fa-redo-alt"></i>
-                    <span class="absolute mt-8 text-[10px] font-bold opacity-70 group-hover:opacity-100 group-hover:text-black">10</span>
                 </button>
             </div>
 
@@ -209,18 +179,12 @@
             else hideUI();
         }
 
-        // أزرار التحكم
+        // زرار التشغيل الوحيد
         document.getElementById('btnPlayPause').addEventListener('click', (e) => {
             e.stopPropagation(); player.togglePlay();
         });
-        document.getElementById('btnForward').addEventListener('click', (e) => {
-            e.stopPropagation(); player.forward(10); resetTimer();
-        });
-        document.getElementById('btnRewind').addEventListener('click', (e) => {
-            e.stopPropagation(); player.rewind(10); resetTimer();
-        });
 
-        // مزامنة الحالة
+        // مزامنة الأيقونة
         player.on('play', () => {
             iconPlay.className = 'fas fa-pause';
             resetTimer();
@@ -230,18 +194,13 @@
             showUI();
         });
 
-        // 🖱️ دعم الماوس (للاب توب والكمبيوتر) 🖱️
-        // أول ما الماوس يتحرك -> أظهر التحكم
+        // دعم الماوس (للاب توب)
         wrapper.addEventListener('mousemove', () => {
-            if(overlay.classList.contains('hidden-ui')) {
-                showUI();
-            } else {
-                // لو الماوس بيتحرك كتير، جدد وقت الإخفاء
-                resetTimer();
-            }
+            if(overlay.classList.contains('hidden-ui')) showUI();
+            else resetTimer();
         });
 
-        // لمس الشاشة (للموبايل والتابلت)
+        // لمس الشاشة (للموبايل)
         overlay.addEventListener('click', (e) => {
             if(e.target === overlay || e.target.classList.contains('center-controls')) {
                 toggleUI();
@@ -251,5 +210,4 @@
         showUI();
     </script>
 </body>
-                    </html>
-                    
+</html>
