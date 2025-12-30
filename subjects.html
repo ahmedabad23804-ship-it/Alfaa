@@ -15,13 +15,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* إعدادات الخلفية والألوان بناءً على الصور */
+        /* إعدادات الخلفية والألوان */
         body { 
             background: #050a18; /* كحلي غامق جداً */
             color: white; 
             font-family: 'Cairo', sans-serif; 
             min-height: 100vh; 
-            padding-bottom: 80px; 
             overflow-x: hidden; 
         }
 
@@ -40,7 +39,6 @@
             margin-bottom: 10px;
         }
 
-        /* أزرار الهيدر (الطاقة والتاج) */
         .icon-btn {
             width: 50px; height: 50px;
             border-radius: 18px;
@@ -54,7 +52,6 @@
         .icon-btn.power:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
         .icon-btn.crown:hover { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border-color: #fbbf24; }
 
-        /* منطقة البروفايل */
         .profile-area {
             display: flex; align-items: center; gap: 12px;
             background: #111526; padding: 6px 15px 6px 6px;
@@ -71,9 +68,7 @@
         }
 
         /* العناوين */
-        .main-title {
-            text-align: center; margin-bottom: 40px;
-        }
+        .main-title { text-align: center; margin-bottom: 40px; }
         .title-text {
             font-size: 2.2rem; font-weight: 900; color: #a5b4fc;
             text-shadow: 0 0 20px rgba(99, 102, 241, 0.3); letter-spacing: 1px;
@@ -87,14 +82,14 @@
             width: 40px; height: 3px; background: #6366f1; border-radius: 2px;
         }
 
-        /* كروت المواد (التصميم الجديد) */
+        /* كروت المواد */
         .subject-card {
-            background: #10152a; /* لون الكارت الغامق */
+            background: #10152a;
             border-radius: 35px;
-            padding: 25px;
+            padding: 0;
             text-align: center;
             height: 280px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            display: flex; flex-direction: column; align-items: center;
             border: 1px solid transparent;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer; position: relative; overflow: hidden;
@@ -107,36 +102,54 @@
             box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        /* صورة المادة */
+        /* حاوية الصورة */
         .s-img-container {
-            width: 130px; height: 130px; margin-bottom: 20px;
-            transition: 0.4s;
+            width: 100%; height: 160px;
+            overflow: hidden;
+            position: relative;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        .subject-card:hover .s-img-container { transform: scale(1.1) rotate(5deg); }
-        .s-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
+        
+        .s-img { 
+            width: 100%; height: 100%; 
+            object-fit: cover;
+            transition: 0.5s;
+            filter: brightness(0.8);
+        }
+        .subject-card:hover .s-img { transform: scale(1.1); filter: brightness(1); }
 
-        /* اسم المادة */
-        .s-name { font-size: 1.6rem; font-weight: 800; color: white; margin-bottom: 15px; }
+        .card-content {
+            padding: 15px;
+            width: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+            flex-grow: 1;
+        }
 
-        /* شارة المعلمين */
+        .s-name { font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 5px; }
+
         .teacher-badge {
             background: #1e2540; color: #94a3b8;
-            padding: 8px 18px; border-radius: 15px;
-            font-size: 0.85rem; font-weight: 700;
-            display: flex; align-items: center; gap: 8px;
+            padding: 6px 14px; border-radius: 12px;
+            font-size: 0.75rem; font-weight: 700;
+            display: flex; align-items: center; gap: 6px;
             transition: 0.3s;
         }
         .subject-card:hover .teacher-badge { background: #6366f1; color: white; }
 
-        /* التحميل */
         .skeleton { background: #111526; border-radius: 35px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
-        /* الحقوق */
+        /* الحقوق (تم التعديل لتصبح في الأسفل وليست ثابتة) */
         .footer-brand {
-            position: fixed; bottom: 20px; left: 0; w-full; text-align: center; width: 100%;
-            font-size: 0.7rem; font-weight: 900; letter-spacing: 3px; color: #334155;
-            text-transform: uppercase; pointer-events: none;
+            text-align: center;
+            margin-top: 50px;
+            padding: 20px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #334155;
+            text-transform: uppercase;
+            border-top: 1px solid rgba(255, 255, 255, 0.02);
         }
     </style>
 </head>
@@ -169,7 +182,7 @@
             <p class="subtitle-text">مسارك للتفوق</p>
         </div>
 
-        <div class="px-6 pb-20 max-w-7xl mx-auto">
+        <div class="px-6 max-w-7xl mx-auto">
             
             <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="i in 3" class="skeleton h-[280px]"></div>
@@ -179,14 +192,15 @@
                 <div v-for="s in subjects" :key="s.id" @click="go(s)" class="subject-card group">
                     
                     <div class="s-img-container">
-                        <img :src="getImg(s.name)" class="s-img">
+                        <img :src="getImg(s.name)" class="s-img" loading="lazy">
                     </div>
 
-                    <h3 class="s-name">{{ s.name }}</h3>
-
-                    <div class="teacher-badge">
-                        <i class="fas fa-chalkboard-user"></i>
-                        <span>{{ s.teachers ? s.teachers.length : 0 }} معلمين</span>
+                    <div class="card-content">
+                        <h3 class="s-name">{{ s.name }}</h3>
+                        <div class="teacher-badge">
+                            <i class="fas fa-chalkboard-user"></i>
+                            <span>{{ s.teachers ? s.teachers.length : 0 }} معلمين</span>
+                        </div>
                     </div>
 
                 </div>
@@ -203,19 +217,19 @@
     </div>
 
     <script>
-        // قاعدة بيانات الصور (نفس الصور 3D اللي في التصميم)
+        // صور حقيقية
         const IMAGES_DB = {
-            "فيزياء": "https://cdn3d.iconscout.com/3d/premium/thumb/physics-7265691-5840333.png",
-            "كيمياء": "https://cdn3d.iconscout.com/3d/premium/thumb/chemistry-atoms-5691557-4740112.png",
-            "أحياء": "https://cdn3d.iconscout.com/3d/premium/thumb/dna-5256241-4385108.png",
-            "لغة عربية": "https://cdn3d.iconscout.com/3d/premium/thumb/ramadan-quran-5136006-4286786.png",
-            "English": "https://cdn3d.iconscout.com/3d/premium/thumb/english-book-10041135-8135359.png",
-            "رياضيات": "https://cdn3d.iconscout.com/3d/premium/thumb/mathematics-9173295-7489437.png",
-            "تاريخ": "https://cdn3d.iconscout.com/3d/premium/thumb/pharaoh-6450376-5310636.png",
-            "جغرافيا": "https://cdn3d.iconscout.com/3d/premium/thumb/earth-5134701-4282715.png",
-            "فرنساوي": "https://cdn3d.iconscout.com/3d/premium/thumb/eiffel-tower-4034026-3337299.png",
-            "جيولوجيا": "https://cdn3d.iconscout.com/3d/premium/thumb/mountain-4940523-4116498.png",
-            "default": "https://cdn3d.iconscout.com/3d/premium/thumb/education-4940505-4116480.png"
+            "فيزياء": "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=600&auto=format&fit=crop",
+            "كيمياء": "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?q=80&w=600&auto=format&fit=crop",
+            "أحياء": "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?q=80&w=600&auto=format&fit=crop",
+            "لغة عربية": "https://images.unsplash.com/photo-1555513904-8b6fa2071f08?q=80&w=600&auto=format&fit=crop",
+            "English": "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=600&auto=format&fit=crop",
+            "رياضيات": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop",
+            "تاريخ": "https://images.unsplash.com/photo-1568684333877-4d39f2c871c9?q=80&w=600&auto=format&fit=crop",
+            "جغرافيا": "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop",
+            "فرنساوي": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=600&auto=format&fit=crop",
+            "جيولوجيا": "https://images.unsplash.com/photo-1616885312388-34440c49122c?q=80&w=600&auto=format&fit=crop",
+            "default": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600&auto=format&fit=crop"
         };
 
         const { createApp, ref, onMounted } = Vue;
@@ -239,23 +253,19 @@
                 };
 
                 const go = (s) => {
-                    // الانتقال لصفحة المدرسين مع تمرير البيانات
                     window.location.href = `teachers.html?yid=${yid.value}&sid=${s.id}`;
                 };
 
                 onMounted(async () => {
-                    // التحقق من الأمان (من ملف auth.js)
                     const code = checkAuth();
                     if(!code) return;
 
                     const db = firebase.database();
                     try {
-                        // 1. جلب بيانات الطالب
                         const userSnap = await db.ref('approvedStudents/'+code).once('value');
                         const user = userSnap.val();
                         if(user) document.getElementById('sName').innerText = user.studentName;
 
-                        // 2. جلب المواد بناءً على الشعبة
                         const URLS = { 
                             'علمي علوم': "https://plus-teal.vercel.app/organized_output.json", 
                             'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
@@ -264,17 +274,23 @@
                         };
 
                         const targetURL = URLS[user.section] || URLS['علمي علوم'];
-                        const res = await fetch(targetURL);
-                        const data = await res.json();
                         
-                        // الوصول للصف الثالث الثانوي (ID: 3)
+                        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve('TIMEOUT'), 5000));
+                        const fetchPromise = fetch(targetURL).then(res => res.json());
+                        const data = await Promise.race([fetchPromise, timeoutPromise]);
+
+                        if(data === 'TIMEOUT') throw new Error("تأخر الاتصال بالسيرفر");
+                        
                         let year = data.find(y => y.id == 3) || data[0];
                         yid.value = year.id;
                         subjects.value = year.subjects || [];
 
                     } catch (e) { 
-                        console.error("Error fetching data:", e);
-                        alert("حدث خطأ في تحميل المواد، تأكد من الاتصال بالإنترنت");
+                        console.error(e);
+                        const fallbackRes = await fetch("https://plus-teal.vercel.app/organized_output.json");
+                        const fallbackData = await fallbackRes.json();
+                        let year = fallbackData.find(y => y.id == 3);
+                        subjects.value = year.subjects || [];
                     } finally { 
                         loading.value = false; 
                     }
