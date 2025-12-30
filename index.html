@@ -12,40 +12,137 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        /* نفس التصميم الاحترافي السابق */
-        :root { --primary-blue: #3b82f6; --accent-gold: #fbbf24; --bg-dark: #020617; --glass-bg: rgba(30, 41, 59, 0.7); --error-red: #ef4444; --success-green: #10b981; --telegram-color: #229ED9; }
+        /* 🎨 ثيم منصة FULL MARK */
+        :root {
+            --primary-blue: #3b82f6;
+            --accent-gold: #fbbf24;
+            --bg-dark: #020617;
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --error-red: #ef4444;
+            --success-green: #10b981;
+            --telegram-color: #229ED9;
+        }
+
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
-        body { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: radial-gradient(circle at 50% 0%, #1e1b4b, #020617 90%); overflow: hidden; color: white; padding: 20px; }
+
+        body {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            min-height: 100vh; /* عشان يملى الشاشة */
+            background: radial-gradient(circle at 50% 0%, #1e1b4b, #020617 90%);
+            color: white; padding: 20px;
+            /* ✅ التعديل هنا: سمحنا بالتمرير عشان لو الشاشة قصيرة (زي التابلت بالعرض) */
+            overflow-y: auto; 
+        }
+
+        /* 🌌 النجوم والشهب */
         .stars-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .star { position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%; box-shadow: 0 0 4px rgba(255,255,255,0.8); animation: twinkle var(--duration) infinite ease-in-out; opacity: 0; }
+        .star {
+            position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255,255,255,0.8);
+            animation: twinkle var(--duration) infinite ease-in-out; opacity: 0;
+        }
         @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
-        .login-card { background: var(--glass-bg); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 24px; padding: 40px; width: 100%; max-width: 420px; text-align: center; backdrop-filter: blur(20px); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); position: relative; overflow: hidden; animation: floatUp 0.8s ease-out; margin-bottom: 20px; }
+
+        /* 💳 كارت الدخول */
+        .login-card {
+            background: var(--glass-bg);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px; padding: 40px;
+            width: 100%; max-width: 420px; text-align: center;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative; overflow: hidden;
+            animation: floatUp 0.8s ease-out;
+            margin: 20px 0; /* مسافة فوق وتحت عشان ميزقش في الحواف */
+        }
         @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .login-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold), var(--primary-blue)); }
-        h2 { font-family: 'Cairo', sans-serif; margin-bottom: 5px; font-size: 2rem; font-weight: 900; background: linear-gradient(to right, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold), var(--primary-blue));
+        }
+
+        h2 {
+            font-family: 'Cairo', sans-serif; margin-bottom: 5px; font-size: 2rem; font-weight: 900;
+            background: linear-gradient(to right, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        
         .typewriter-container { min-height: 25px; margin-bottom: 25px; }
-        .typewriter-text { color: var(--accent-gold); font-size: 0.95rem; font-weight: bold; border-left: 2px solid var(--primary-blue); padding-left: 5px; animation: blink 0.7s infinite; }
+        .typewriter-text {
+            color: var(--accent-gold); font-size: 0.95rem; font-weight: bold;
+            border-left: 2px solid var(--primary-blue); padding-left: 5px;
+            animation: blink 0.7s infinite;
+        }
         @keyframes blink { 50% { border-color: transparent; } }
+
         .input-group { position: relative; margin-bottom: 20px; }
-        .input-group input { width: 100%; padding: 15px 50px 15px 20px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 15px; color: white; font-size: 1.1rem; text-align: center; outline: none; transition: 0.3s; font-family: monospace; font-weight: bold; letter-spacing: 2px; }
+        .input-group input {
+            width: 100%; padding: 15px 50px 15px 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px; color: white; font-size: 1.1rem;
+            text-align: center; outline: none; transition: 0.3s;
+            font-family: monospace; font-weight: bold; letter-spacing: 2px;
+        }
         .input-group input:focus { border-color: var(--primary-blue); background: rgba(15, 23, 42, 0.9); }
         .input-group .icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--primary-blue); }
-        .login-btn { width: 100%; padding: 15px; border: none; border-radius: 15px; background: linear-gradient(135deg, var(--primary-blue), #4f46e5); color: white; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+
+        .login-btn {
+            width: 100%; padding: 15px; border: none; border-radius: 15px;
+            background: linear-gradient(135deg, var(--primary-blue), #4f46e5);
+            color: white; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.3s;
+        }
         .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5); }
         .login-btn:disabled { opacity: 0.7; cursor: wait; }
-        .contact-btn { display: inline-flex; align-items: center; gap: 10px; background: rgba(34, 158, 217, 0.15); color: var(--telegram-color); border: 1px solid rgba(34, 158, 217, 0.3); padding: 10px 25px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 0.9rem; transition: 0.3s; cursor: pointer; box-shadow: 0 0 15px rgba(34, 158, 217, 0.1); }
-        .contact-btn:hover { background: var(--telegram-color); color: white; box-shadow: 0 0 20px rgba(34, 158, 217, 0.4); transform: translateY(-2px); }
+
+        .contact-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(34, 158, 217, 0.15); color: var(--telegram-color);
+            border: 1px solid rgba(34, 158, 217, 0.3);
+            padding: 10px 25px; border-radius: 50px;
+            font-weight: bold; text-decoration: none; font-size: 0.9rem;
+            transition: 0.3s; cursor: pointer;
+            box-shadow: 0 0 15px rgba(34, 158, 217, 0.1);
+            margin-top: 10px;
+        }
+        .contact-btn:hover {
+            background: var(--telegram-color); color: white;
+            box-shadow: 0 0 20px rgba(34, 158, 217, 0.4); transform: translateY(-2px);
+        }
+
         #autoLoginSection { display: none; }
         .countdown-container { position: relative; width: 120px; height: 120px; margin: 0 auto 25px; }
         .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
         .progress-ring__circle-bg { stroke: rgba(251, 191, 36, 0.2); }
-        .progress-ring__circle { stroke: var(--accent-gold); stroke-dasharray: 326.7256; stroke-dashoffset: 326.7256; transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 8px var(--accent-gold)); }
-        .timer-display { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2.5rem; font-weight: 900; color: var(--accent-gold); }
+        .progress-ring__circle {
+            stroke: var(--accent-gold); stroke-dasharray: 326.7256; stroke-dashoffset: 326.7256;
+            transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 8px var(--accent-gold));
+        }
+        .timer-display {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2.5rem; font-weight: 900; color: var(--accent-gold);
+        }
+        
         .welcome-text { color: #fff; font-size: 1.2rem; margin-bottom: 5px; font-weight: bold; }
-        .code-badge { background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); padding: 5px 15px; border-radius: 20px; font-family: monospace; border: 1px solid rgba(251, 191, 36, 0.3); display: inline-block; margin-bottom: 20px; }
-        .cancel-btn { background: rgba(239, 68, 68, 0.15); color: #fca5a5; padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.3); cursor: pointer; font-size: 0.9rem; transition: 0.3s; width: 100%; }
+        .code-badge { 
+            background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); 
+            padding: 5px 15px; border-radius: 20px; font-family: monospace; 
+            border: 1px solid rgba(251, 191, 36, 0.3); display: inline-block; margin-bottom: 20px;
+        }
+        
+        .cancel-btn {
+            background: rgba(239, 68, 68, 0.15); color: #fca5a5;
+            padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer; font-size: 0.9rem; transition: 0.3s; width: 100%;
+        }
         .cancel-btn:hover { background: rgba(239, 68, 68, 0.3); color: white; }
+
         #statusMessage { margin-bottom: 15px; padding: 10px; border-radius: 10px; font-size: 0.9rem; display: none; }
+
+        /* ✅ الحقوق: خليناها عادية عشان تنزل تحت لما نعمل سكرول */
+        .footer-rights {
+            margin-top: 25px; text-align: center; opacity: 0.7; font-size: 0.8rem; pointer-events: none;
+        }
     </style>
 </head>
 <body>
@@ -105,7 +202,7 @@
         <span>تواصل للدعم الفني</span>
     </a>
 
-    <div style="position:fixed; bottom:15px; width:100%; text-align:center; opacity:0.7; font-size:0.8rem; pointer-events:none;">
+    <div class="footer-rights">
         <span style="color:#fbbf24; font-weight:bold;">ELGIZAWY</span> <span style="color:#94a3b8;">Developed By</span>
     </div>
 
@@ -161,7 +258,6 @@
         function getDeviceID() {
             let did = localStorage.getItem('FULLMARK_DEVICE_ID');
             if (!did) {
-                // إنشاء بصمة فريدة للجهاز وتخزينها للأبد
                 did = 'DEV-' + Date.now().toString(36) + Math.random().toString(36).substr(2, 9).toUpperCase();
                 localStorage.setItem('FULLMARK_DEVICE_ID', did);
             }
@@ -197,13 +293,10 @@
                 
                 // 4. 🔥 التحقق من الجهاز (أهم خطوة) 🔥
                 if (data.deviceId) {
-                    // الكود مربوط بجهاز، هل هو جهازي؟
                     if (data.deviceId !== myDeviceID) {
-                        // لو الكود مستخدم على جهاز تاني -> اطرده
                         throw new Error("⛔ هذا الكود مسجل على جهاز آخر!\nلا يمكن استخدام الكود إلا على جهاز واحد.\nتواصل مع المشرف لفك الربط.");
                     }
                 } else {
-                    // الكود جديد ولم يربط بجهاز -> اربطه بجهازي الآن
                     await db.ref('approvedStudents/' + code).update({ deviceId: myDeviceID });
                 }
 
@@ -275,5 +368,5 @@
         });
     </script>
 </body>
-        </html>
-        
+    </html>
+    
