@@ -27,9 +27,21 @@
             --plyr-menu-color: #f8fafc;
         }
 
+        /* ✅ إصلاح زرار التكبير والتصغير */
+        /* 1. رفع شريط التحكم فوق كل الطبقات */
+        .plyr__controls {
+            z-index: 1000 !important; /* رقم عالي جداً عشان يضمن الظهور */
+            position: relative;
+        }
+        
+        /* 2. إجبار زر التكبير على الظهور */
+        button[data-plyr="fullscreen"] {
+            display: inline-block !important;
+        }
+
         /* زر الرجوع */
         .back-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 60;
+            position: absolute; top: 20px; right: 20px; z-index: 1100; /* أعلى من الفيديو */
             width: 45px; height: 45px; border-radius: 15px;
             background: rgba(15, 23, 42, 0.6); color: white;
             display: flex; align-items: center; justify-content: center;
@@ -48,11 +60,11 @@
             100% { top: 90%; left: 90%; transform: rotate(-5deg); }
         }
 
-        /* ✅ تعديل مناطق اللمس المزدوج */
+        /* مناطق اللمس المزدوج */
         .dt-zone {
             position: absolute; top: 0; 
-            bottom: 80px; /* ✅ أهم تعديل: رفعنا المنطقة عشان متغطيش الزرار */
-            width: 35%; z-index: 50; /* زاد الـ z-index عشان يبقى فوق الفيديو */
+            bottom: 100px; /* ✅ رفعناها 100 بيكسل عشان نبعد عن شريط التحكم تماماً */
+            width: 35%; z-index: 50;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.2s; pointer-events: auto;
         }
@@ -64,9 +76,6 @@
             backdrop-filter: blur(5px); display: flex; flex-direction: column; 
             align-items: center; color: white; transform: scale(0.8);
         }
-
-        /* منع التفاعل مع الـ Double Click الافتراضي لـ Plyr */
-        .plyr--fullscreen-enabled [data-plyr="fullscreen"] { display: block !important; }
     </style>
 </head>
 <body oncontextmenu="return false;">
@@ -75,7 +84,7 @@
     <div id="watermark" class="security-watermark">Loading ID...</div>
 
     <div class="video-wrapper">
-        <div id="player-container" class="w-full max-w-5xl h-full flex items-center"></div>
+        <div id="player-container" class="w-full max-w-5xl h-full flex items-center justify-center"></div>
 
         <div id="tapLeft" class="dt-zone dt-left">
             <div class="tap-icon"><i class="fas fa-backward text-3xl"></i><span class="text-sm font-bold mt-2">10s</span></div>
@@ -98,6 +107,9 @@
             alert("خطأ في الفيديو"); history.back();
         } else {
             let src = videoData.stream_url || videoData.video_url || "";
+            // تنظيف الرابط
+            src = src.trim();
+
             if(src.includes('youtube') || src.includes('youtu.be')) {
                 let videoId = src.split('v=')[1]?.split('&')[0] || src.split('youtu.be/')[1]?.split('?')[0];
                 container.innerHTML = `<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="${videoId}"></div>`;
@@ -105,47 +117,46 @@
                 container.innerHTML = `<video id="player" playsinline controls><source src="${src}" type="video/mp4" /></video>`;
             }
 
+            // إعدادات المشغل
             const player = new Plyr('#player', {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+                // ✅ ترتيب الأزرار وإضافة زر التكبير fullscreen
+                controls: [
+                    'play-large', // زر التشغيل الكبير في النص
+                    'play', // زر التشغيل الصغير تحت
+                    'progress', // شريط الوقت
+                    'current-time', // الوقت الحالي
+                    'duration', // الوقت الكلي
+                    'mute', // كتم الصوت
+                    'volume', // مستوى الصوت
+                    'settings', // الإعدادات (الجودة والسرعة)
+                    'fullscreen' // ✅ زر التكبير والتصغير
+                ],
                 settings: ['quality', 'speed'],
                 speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
-                clickToPlay: true, // السماح بالتشغيل بالضغط مرة واحدة
-                fullscreen: { enabled: true, fallback: true, iosNative: false }
+                fullscreen: { enabled: true, fallback: true, iosNative: false },
+                clickToPlay: true
             });
 
-            // ✅ 1. كود سحري لمنع التكبير عند الضغط مرتين على الشاشة
-            // نقوم باعتراض حدث الـ dblclick ونوقفه تماماً قبل ما يوصل للفيديو
+            // منع التكبير باللمس المزدوج على الشاشة
             document.querySelector('.video-wrapper').addEventListener('dblclick', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-            }, true); // true مهمة جداً عشان نمسك الحدث في الأول
+                e.preventDefault(); e.stopPropagation();
+            }, true);
 
-            // ✅ 2. كود اللمس المزدوج للتقديم والتأخير
+            // تشغيل التقديم والترجيع
             const tapLeft = document.getElementById('tapLeft');
             const tapRight = document.getElementById('tapRight');
             let lastTapTime = 0;
 
             function handleDoubleTap(e, action) {
-                // منع الحدث من الوصول لـ Plyr عشان ميعملش Play/Pause
-                e.stopPropagation();
-                e.preventDefault();
-
+                e.stopPropagation(); e.preventDefault();
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
 
                 if (tapLength < 300 && tapLength > 0) {
-                    // Double Tap Detect
-                    if (action === 'forward') {
-                        player.forward(10);
-                        animateTap(tapRight);
-                    } else {
-                        player.rewind(10);
-                        animateTap(tapLeft);
-                    }
+                    if (action === 'forward') { player.forward(10); animateTap(tapRight); } 
+                    else { player.rewind(10); animateTap(tapLeft); }
                 } else {
-                    // Single Tap (ممكن نشغل/نوقف الفيديو لو حابب، أو نسيبه)
-                    // حالياً هنسيبه عشان ميتعارضش مع الـ Double
-                    player.togglePlay(); 
+                    player.togglePlay();
                 }
                 lastTapTime = currentTime;
             }
@@ -155,7 +166,6 @@
                 setTimeout(() => { element.style.opacity = '0'; }, 400);
             }
 
-            // استخدام 'click' بدل 'touchstart' عشان التوافق
             tapRight.addEventListener('click', (e) => handleDoubleTap(e, 'forward'));
             tapLeft.addEventListener('click', (e) => handleDoubleTap(e, 'backward'));
         }
