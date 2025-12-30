@@ -33,41 +33,45 @@
 
         .header-container {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 25px; margin-bottom: 10px;
+            padding: 15px 20px; margin-bottom: 10px;
         }
 
         .icon-btn {
-            width: 50px; height: 50px; border-radius: 18px;
+            width: 45px; height: 45px; border-radius: 14px;
             background: #111526; border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; color: #5b6a8e; transition: 0.3s; cursor: pointer;
+            font-size: 1.2rem; color: #5b6a8e; transition: 0.3s; cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .icon-btn.power:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
         .icon-btn.crown:hover { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border-color: #fbbf24; }
 
         .profile-area {
-            display: flex; align-items: center; gap: 12px;
-            background: #111526; padding: 6px 15px 6px 6px;
+            display: flex; align-items: center; gap: 10px;
+            background: #111526; padding: 5px 12px 5px 5px;
             border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.05);
         }
         .p-img-box {
-            width: 45px; height: 45px; border-radius: 50%;
+            width: 40px; height: 40px; border-radius: 50%;
             border: 2px solid #6366f1; padding: 2px; position: relative;
         }
         .p-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #0f172a; }
         .p-status {
-            position: absolute; bottom: 0; right: 0; width: 12px; height: 12px;
+            position: absolute; bottom: 0; right: 0; width: 10px; height: 10px;
             background: #22c55e; border: 2px solid #111526; border-radius: 50%;
         }
 
-        .main-title { text-align: center; margin-bottom: 40px; }
+        .main-title { text-align: center; margin-bottom: 30px; margin-top: 10px; }
         .title-text {
-            font-size: 2.2rem; font-weight: 900; color: #a5b4fc;
+            font-size: 1.8rem; font-weight: 900; color: #a5b4fc;
             text-shadow: 0 0 20px rgba(99, 102, 241, 0.3); letter-spacing: 1px;
         }
+        /* تكبير الخط في الشاشات الكبيرة */
+        @media (min-width: 768px) {
+            .title-text { font-size: 2.5rem; }
+        }
         .subtitle-text {
-            color: #64748b; font-size: 0.9rem; font-weight: 700;
+            color: #64748b; font-size: 0.8rem; font-weight: 700;
             margin-top: -5px; position: relative; display: inline-block;
         }
         .subtitle-text::after {
@@ -75,34 +79,48 @@
             width: 40px; height: 3px; background: #6366f1; border-radius: 2px;
         }
 
+        /* كارت المادة المتجاوب */
         .subject-card {
-            background: #10152a; border-radius: 35px; padding: 0;
-            text-align: center; height: 280px;
+            background: #10152a; border-radius: 25px; padding: 0;
+            text-align: center; 
+            /* ألغيت الطول الثابت عشان يبقى مرن */
             display: flex; flex-direction: column; align-items: center;
             border: 1px solid transparent; transition: all 0.4s;
             cursor: pointer; position: relative; overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.3);
         }
         .subject-card:hover {
-            transform: translateY(-10px); border-color: #3b4566;
-            background: #151b33; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-8px); border-color: #3b4566;
+            background: #151b33; box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15);
         }
 
         .s-img-container {
-            width: 100%; height: 160px; overflow: hidden; position: relative;
+            width: 100%; height: 150px; overflow: hidden; position: relative;
             background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
+        /* تكبير الصورة في اللاب توب */
+        @media (min-width: 1024px) {
+            .s-img-container { height: 180px; }
+        }
+
         .s-img { 
             width: 100%; height: 100%; object-fit: cover;
-            transition: 0.5s; filter: brightness(0.8);
+            transition: 0.5s; filter: brightness(0.85);
         }
-        .subject-card:hover .s-img { transform: scale(1.1); filter: brightness(1); }
+        .subject-card:hover .s-img { transform: scale(1.05); filter: brightness(1); }
 
         .card-content {
             padding: 15px; width: 100%;
-            display: flex; flex-direction: column; align-items: center; justify-content: space-between;
-            flex-grow: 1;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 10px;
         }
-        .s-name { font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 5px; }
+        .s-name { 
+            font-size: 1.2rem; font-weight: 800; color: white; margin: 0; line-height: 1.4;
+        }
+        /* تكبير اسم المادة في اللاب توب */
+        @media (min-width: 1024px) {
+            .s-name { font-size: 1.4rem; }
+        }
 
         .teacher-badge {
             background: #1e2540; color: #94a3b8;
@@ -112,12 +130,12 @@
         }
         .subject-card:hover .teacher-badge { background: #6366f1; color: white; }
 
-        .skeleton { background: #111526; border-radius: 35px; animation: pulse 1.5s infinite; }
+        .skeleton { background: #111526; border-radius: 25px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
         .footer-brand {
             text-align: center; margin-top: 50px; padding: 20px;
-            font-size: 0.8rem; font-weight: 900; letter-spacing: 3px; color: #334155;
+            font-size: 0.7rem; font-weight: 900; letter-spacing: 2px; color: #334155;
             text-transform: uppercase; border-top: 1px solid rgba(255, 255, 255, 0.02);
         }
     </style>
@@ -127,13 +145,12 @@
 
     <div id="app">
         <header class="header-container">
-            <div class="flex gap-3">
+            <div class="flex gap-2">
                 <div @click="logout" class="icon-btn power"><i class="fas fa-power-off"></i></div>
                 <a href="profile.html" class="icon-btn crown"><i class="fas fa-crown"></i></a>
             </div>
             <div class="profile-area">
-                <div class="text-right">
-                    <h2 class="text-white font-bold text-sm leading-tight" id="sName">...</h2>
+                <div class="text-right hidden sm:block"> <h2 class="text-white font-bold text-sm leading-tight" id="sName">...</h2>
                     <p class="text-[10px] text-indigo-400 font-bold">بطل الثانوية 🎓</p>
                 </div>
                 <div class="p-img-box">
@@ -148,12 +165,12 @@
             <p class="subtitle-text">مسارك للتفوق</p>
         </div>
 
-        <div class="px-6 max-w-7xl mx-auto">
-            <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-for="i in 3" class="skeleton h-[280px]"></div>
+        <div class="px-4 md:px-8 max-w-[1400px] mx-auto">
+            <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
+                <div v-for="i in 4" class="skeleton h-[260px]"></div>
             </div>
 
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 md:gap-6">
                 <div v-for="s in subjects" :key="s.id" @click="go(s)" class="subject-card group">
                     <div class="s-img-container">
                         <img :src="getImg(s.name)" class="s-img" loading="lazy" onerror="this.src='images/default.jpg'">
@@ -178,18 +195,17 @@
     </div>
 
     <script>
-        // ✅ قاعدة البيانات المحدثة: تستخدم now more_images للصور التي قمت برفعها هناك
+        // ✅ قاعدة البيانات (الصور)
         const IMAGES_DB = {
-            // المواد الموجودة في مجلد images القديم
             "لغة عربية": "images/arabic.jpg",
             "فيزياء": "images/physics.jpg",
             "كيمياء": "images/chemistry.jpg",
             "أحياء": "images/biology.jpg",
             "رياضيات": "images/math.jpg",
             "تاريخ": "images/history.jpg",
-            "جيولوجيا": "images/physics.jpg", // صورة مؤقتة
-
-            // المواد الموجودة في مجلد more_images الجديد (بأسماء الملفات الدقيقة)
+            "جيولوجيا": "images/physics.jpg",
+            
+            // more_images
             "english": "more_images/english (3).jpg",
             "french": "more_images/french (1).jpg",
             "geo": "more_images/geo (2).jpg",
@@ -206,10 +222,9 @@
                 const loading = ref(true);
                 const yid = ref(null);
 
-                // ✅ دالة البحث عن الصور تم تحديثها لتقرأ من المجلدين
+                // دالة جلب الصور (نفس اللوجيك السليم)
                 const getImg = (n) => {
                     const name = n.toLowerCase();
-                    // بحث في مجلد images
                     if (name.includes('عربي') || name.includes('arabic')) return IMAGES_DB["لغة عربية"];
                     if (name.includes('فيزياء') || name.includes('physics')) return IMAGES_DB["فيزياء"];
                     if (name.includes('كيمياء') || name.includes('chemistry')) return IMAGES_DB["كيمياء"];
@@ -217,14 +232,11 @@
                     if (name.includes('رياضيات') || name.includes('math')) return IMAGES_DB["رياضيات"];
                     if (name.includes('تاريخ') || name.includes('history')) return IMAGES_DB["تاريخ"];
                     
-                    // بحث في مجلد more_images
                     if (name.includes('english') || name.includes('انجليزي')) return IMAGES_DB["english"];
                     if (name.includes('جغرافيا') || name.includes('geo')) return IMAGES_DB["geo"];
-                    // ✅ تم التعديل هنا: إضافة français و le français
                     if (name.includes('فرنساوي') || name.includes('french') || name.includes('français')) return IMAGES_DB["french"];
                     if (name.includes('إحصاء') || name.includes('stats')) return IMAGES_DB["stats"];
 
-                    // الجيولوجيا (تستخدم صورة الفيزياء مؤقتاً لو مش موجودة)
                     if (name.includes('جيولوجيا')) return IMAGES_DB["جيولوجيا"];
 
                     return IMAGES_DB['default'];
@@ -249,7 +261,10 @@
                     try {
                         const userSnap = await db.ref('approvedStudents/'+code).once('value');
                         const user = userSnap.val();
-                        if(user) document.getElementById('sName').innerText = user.studentName;
+                        if(user) {
+                            const nameEl = document.getElementById('sName');
+                            if(nameEl) nameEl.innerText = user.studentName;
+                        }
 
                         const URLS = { 
                             'علمي علوم': "https://plus-teal.vercel.app/organized_output.json", 
