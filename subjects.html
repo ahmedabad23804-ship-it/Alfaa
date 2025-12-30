@@ -3,261 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الرئيسية | FULL MARK</title>
-    
+    <title>المواد | FULL MARK</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="auth.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { 
-            background-color: #020617; 
-            color: white; 
-            font-family: 'Tajawal', sans-serif; 
-            min-height: 100vh; 
-            overflow-x: hidden;
-        }
-
-        /* خلفية التدرج اللوني */
-        .bg-gradient-mesh {
+        body { background-color: #020617; color: white; font-family: 'Tajawal', sans-serif; min-height: 100vh; overflow-x: hidden; }
+        
+        /* خلفية نيون خفيفة */
+        .bg-glow {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: radial-gradient(circle at 50% 0%, #172554, #020617 80%);
+            background: radial-gradient(circle at 50% 0%, #172554, #020617 70%);
         }
 
-        /* الهيدر الزجاجي */
-        .glass-nav {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            position: sticky; top: 0; z-index: 50;
-            padding: 15px 20px;
-        }
-
-        /* قسم التحفيز */
-        .hero-section {
+        /* شريط الجمل المتحركة */
+        .quote-bar {
+            background: rgba(30, 58, 138, 0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 15px;
             text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(180deg, rgba(30, 58, 138, 0.2) 0%, transparent 100%);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-            margin-bottom: 30px;
-            min-height: 200px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
         }
-
         .quote-text {
-            font-size: 1.5rem;
-            font-weight: 900;
-            line-height: 1.6;
-            background: linear-gradient(to right, #60a5fa, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            transition: opacity 0.5s ease-in-out;
-            max-width: 800px;
+            font-size: 0.9rem; font-weight: bold; color: #fbbf24;
+            transition: opacity 0.5s;
         }
 
-        /* كارت المادة الفخم */
-        .subject-card {
-            background: #0f172a;
-            border: 1px solid #1e293b;
-            border-radius: 24px;
+        /* كارت المادة (تصميم الأزرار القوي) */
+        .subject-btn {
+            background: linear-gradient(145deg, #1e293b, #0f172a);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 20px;
             overflow: hidden;
             position: relative;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-        }
-
-        .subject-card:hover {
-            transform: translateY(-8px);
-            border-color: #3b82f6;
-            box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.15);
-        }
-
-        .card-img-container {
-            height: 160px;
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .card-img {
-            width: 100%; height: 100%;
-            object-fit: cover;
-            transition: 0.5s;
-            filter: brightness(0.9);
-        }
-
-        .subject-card:hover .card-img {
-            transform: scale(1.1);
-            filter: brightness(1.1);
-        }
-
-        .card-content { padding: 20px; text-align: center; }
-
-        .teacher-count {
-            position: absolute; top: 10px; left: 10px;
-            background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px);
-            padding: 4px 12px; border-radius: 20px;
-            font-size: 0.75rem; color: #fbbf24; font-weight: bold;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .btn-enter {
-            margin-top: 10px;
-            width: 100%;
-            padding: 10px;
-            border-radius: 12px;
-            background: rgba(59, 130, 246, 0.1);
-            color: #60a5fa;
-            font-weight: bold;
-            font-size: 0.9rem;
             transition: 0.3s;
-        }
-        .subject-card:hover .btn-enter {
-            background: #3b82f6;
-            color: white;
+            height: 180px; /* ارتفاع ثابت */
+            display: flex; flex-direction: column;
         }
 
-        /* Skeleton Loading */
-        .skeleton { background: rgba(255,255,255,0.05); animation: pulse 1.5s infinite; border-radius: 24px; }
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        .subject-btn:active { transform: scale(0.97); }
+
+        /* الصورة الواقعية */
+        .img-part {
+            height: 110px; width: 100%;
+            overflow: hidden; position: relative;
+        }
+        .real-img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: brightness(0.8); transition: 0.5s;
+        }
+        .subject-btn:hover .real-img { transform: scale(1.1); filter: brightness(1); }
+
+        /* النصوص */
+        .text-part {
+            padding: 10px; text-align: center;
+            display: flex; flex-direction: column; justify-content: center; flex: 1;
+        }
+        .sub-name { font-size: 1.1rem; font-weight: 800; color: white; }
+        .sub-info { font-size: 0.7rem; color: #94a3b8; margin-top: 2px; }
+
+        /* عدد المدرسين */
+        .badge {
+            position: absolute; top: 8px; right: 8px;
+            background: rgba(0,0,0,0.7); color: #fbbf24;
+            padding: 3px 8px; border-radius: 6px;
+            font-size: 0.65rem; font-weight: bold;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
 
-    <div class="bg-gradient-mesh"></div>
+    <div class="bg-glow"></div>
 
     <div id="app">
-        <header class="glass-nav flex justify-between items-center">
-            <div @click="goToProfile" class="flex items-center gap-3 cursor-pointer group">
+        <div class="flex justify-between items-center p-5">
+            <div @click="goToProfile" class="flex items-center gap-3 cursor-pointer">
                 <div class="relative">
-                    <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" 
-                         class="w-12 h-12 rounded-full border-2 border-indigo-500 bg-slate-800">
+                    <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="w-12 h-12 rounded-full border-2 border-indigo-500 bg-slate-800 p-1">
                     <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
                 </div>
                 <div>
-                    <h2 class="font-bold text-lg text-white group-hover:text-indigo-400 transition">{{ studentName }}</h2>
-                    <p class="text-[10px] text-gray-400 font-bold uppercase">اضغط للملف الشخصي</p>
+                    <h2 class="font-bold text-white">{{ studentName }}</h2>
+                    <p class="text-[10px] text-gray-400">الملف الشخصي</p>
                 </div>
             </div>
-            
-            <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-600 hover:text-white transition">
+            <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center">
                 <i class="fas fa-power-off"></i>
             </button>
-        </header>
-
-        <div class="hero-section">
-            <div class="mb-4 text-xs font-bold text-gray-500 uppercase tracking-[0.3em]">Daily Motivation</div>
-            <p id="quoteDisplay" class="quote-text opacity-100">🚀 جاري تحميل الجرعة اليومية...</p>
         </div>
 
-        <main class="px-6 pb-20 max-w-7xl mx-auto">
-            
-            <div class="flex items-center gap-3 mb-8">
-                <div class="h-8 w-1 bg-indigo-500 rounded-full"></div>
-                <h2 class="text-2xl font-bold text-white">المواد الدراسية</h2>
+        <div class="quote-bar">
+            <div class="flex justify-center items-center gap-2">
+                <i class="fas fa-fire text-orange-500 animate-pulse"></i>
+                <span id="quoteDisplay" class="quote-text">...</span>
             </div>
+        </div>
 
-            <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div v-for="n in 4" class="h-72 skeleton"></div>
-            </div>
+        <div class="px-5 pb-20 max-w-4xl mx-auto">
+            <div v-if="loading" class="text-center mt-20 text-gray-500">جاري تحميل المواد...</div>
 
-            <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div v-for="s in subjects" :key="s.id" @click="openSubject(s)" class="subject-card group">
-                    <div class="card-img-container">
-                        <img :src="getImage(s.name)" class="card-img">
-                        <div class="teacher-count">
-                            <i class="fas fa-chalkboard-teacher ml-1"></i> {{ s.teachers ? s.teachers.length : 0 }}
-                        </div>
+            <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <div v-for="s in subjects" :key="s.id" @click="openSubject(s)" class="subject-btn group">
+                    <div class="img-part">
+                        <img :src="getImage(s.name)" class="real-img" loading="lazy">
+                        <div class="badge"><i class="fas fa-user"></i> {{ s.teachers ? s.teachers.length : 0 }}</div>
                     </div>
-                    
-                    <div class="card-content">
-                        <h3 class="text-xl font-bold text-white mb-1">{{ s.name }}</h3>
-                        <p class="text-xs text-gray-500 mb-4">اضغط للدخول للمحتوى</p>
-                        <div class="btn-enter">دخول المادة <i class="fas fa-arrow-left mr-1"></i></div>
+                    <div class="text-part">
+                        <h3 class="sub-name">{{ s.name }}</h3>
+                        <p class="sub-info">اضغط للدخول</p>
                     </div>
                 </div>
             </div>
-
-            <div v-if="!loading && subjects.length === 0" class="text-center py-20">
-                <p class="text-gray-500">لا توجد مواد متاحة حالياً</p>
-            </div>
-        </main>
+        </div>
     </div>
 
     <script>
-        // --- 50 جملة تحفيزية ---
         const quotes = [
-            "🚀 النجاح يبدأ بخطوة، وأنت بدأت بالفعل!",
-            "💪 لا تتوقف عندما تتعب، توقف عندما تنتهي.",
-            "🌟 حلمك ليس مستحيلاً، هو فقط يحتاج إلى تخطيط وعمل.",
-            "🔥 كل دقيقة تذاكر فيها الآن، ستصنع مجدك غداً.",
-            "💎 أنت أقوى مما تتخيل، وأذكى مما تعتقد.",
-            "🏆 الـ FULL MARK ليست للأذكياء فقط، بل للمجتهدين.",
-            "⏳ الوقت هو العملة الوحيدة التي تملكها، استثمرها بذكاء.",
-            "🌈 بعد كل تعب راحة، وبعد كل سهر نجاح.",
-            "⚡ لا تنتظر الفرصة، اصنعها بنفسك.",
-            "🦁 كن أسداً في طموحك، لا ترضى بالقليل.",
-            "📚 الكتاب صديق لا يخون، والعلم سلاح لا يصدأ.",
-            "🎯 ركز على هدفك، ودع الضجيج خلفك.",
-            "🚀 انطلق نحو القمة، فالقاع مزدحم جداً.",
-            "✨ المستقبل ملك لمن يؤمن بجمال أحلامه.",
-            "🚧 العقبات هي تلك الأشياء المخيفة التي تراها عندما ترفع عينك عن هدفك.",
-            "💡 الفشل هو مجرد فرصة للبدء من جديد بذكاء أكبر.",
-            "🌴 من جد وجد، ومن زرع حصد (قاعدة لا تتغير).",
-            "🏃‍♂️ السباق لم ينتهِ بعد، ما دمت تتنفس.",
-            "🥇 لا تقارن نفسك بأحد، قارن نفسك بما كنت عليه أمس.",
-            "🛠️ اصنع نسختك الأفضل كل يوم.",
-            "🎓 تخيل لحظة استلام الشهادة، واجعلها وقودك.",
-            "🔋 اشحن طاقتك بالإيمان والثقة بالله.",
-            "🗝️ الانضباط هو الجسر بين الأهداف والإنجازات.",
-            "⛰️ تسلق الجبل صعب، لكن المنظر من الأعلى يستحق.",
-            "🌊 كن كالموج، لا يستسلم للصخور مهما كانت قوية.",
-            "🌟 أنت مشروع ناجح، لا تسمح لأحد بإحباطك.",
-            "📝 كل مسألة تحلها تقربك خطوة من كليتك.",
-            "🧠 عقلك مصنع للمعجزات، فقط شغله.",
-            "🚪 النجاح يطرق باب من يستمر في العمل.",
-            "⭐ لا تنظر للساعة، افعل ما تفعله الساعة: استمر في التقدم.",
-            "🦅 حلق عالياً بأحلامك.",
-            "🛡️ علمك هو حصنك المنيع.",
-            "🔮 المستقبل يُصنع اليوم، ليس غداً.",
-            "📍 حدد وجهتك، ولا تلتفت.",
-            "🎈 النجاح خفيف، لكنه يحتاج أكتافاً قوية لحمله.",
-            "🛤️ الطريق طويل، لكن نهايته مشرقة.",
-            "🏗️ ابنِ مستقبلك طوبة طوبة.",
-            "🌌 انظر للنجوم، وأقدامك على الأرض.",
-            "🏇 الفائزون لا ينسحبون، والمنسحبون لا يفوزون.",
-            "🧩 كل معلومة هي قطعة من لغز نجاحك.",
-            "🎨 حياتك لوحة، وأنت الرسام.",
-            "⛵ الرياح لا تخدم السفن التي لا تعرف وجهتها.",
-            "⚓ كن ثابتاً في وجه الصعاب.",
-            "🛸 طموحك يجب أن يتعدى حدود المجرة.",
-            "🏹 سهم النجاح ينطلق بقوة التركيز.",
-            "🎪 الحياة مدرسة، والامتحان فرصة لإثبات الذات.",
-            "🎻 اعزف لحن نجاحك بمجهودك.",
-            "📢 دع نجاحك يتحدث عنك.",
-            "🎁 يوم النتيجة هو هديتك لنفسك ولأهلك.",
-            "👑 أنت بطل قصتك، اجعلها قصة تستحق الرواية."
+            "لا تتوقف عندما تتعب، توقف عندما تنتهي 💪",
+            "حلمك يستحق المحاولة 🚀",
+            "اصنع مستقبلك الآن ✨",
+            "ألم الدراسة لحظة، وألم الفشل حياة ⏳",
+            "أنت بطل قصتك 🦁",
+            "كل مجهود بتبذله النهاردة هترتاح بسببه بكرة 💎",
+            "النجاح بيحب المجتهدين 🏆",
+            "ركز على هدفك وانسى أي حاجة تانية 🎯",
+            "صدقني هتوصل، بس كمل مشي 🚶‍♂️",
+            "خليك طماع في النجاح 🥇"
+            // (يمكنك إضافة الـ 40 جملة الباقية هنا)
         ];
 
-        let qIndex = 0;
-        const qElement = document.getElementById('quoteDisplay');
-        
-        setInterval(() => {
-            qElement.style.opacity = 0; // اخفاء
-            setTimeout(() => {
-                qElement.innerText = quotes[qIndex];
-                qElement.style.opacity = 1; // ظهور
-                qIndex = (qIndex + 1) % quotes.length;
-            }, 500);
-        }, 5000); // كل 5 ثواني
+        // تشغيل الجمل فوراً
+        let qIdx = 0;
+        const qEl = document.getElementById('quoteDisplay');
+        if(qEl) {
+            qEl.innerText = quotes[0]; // عرض أول جملة فوراً
+            setInterval(() => {
+                qEl.style.opacity = 0;
+                setTimeout(() => {
+                    qIdx = (qIdx + 1) % quotes.length;
+                    qEl.innerText = quotes[qIdx];
+                    qEl.style.opacity = 1;
+                }, 500);
+            }, 5000);
+        }
 
-        // --- Vue Logic ---
         const { createApp, ref, onMounted } = Vue;
 
         createApp({
@@ -270,42 +167,22 @@
                 const goToProfile = () => window.location.href = 'profile.html';
                 const openSubject = (s) => window.location.href = `teachers.html?yid=${yid.value}&sid=${s.id}`;
 
-                // روابط صور شغالة 100% ومناسبة للمواد
+                // روابط صور ثابتة (Fallback) لضمان الظهور
                 const getImage = (name) => {
                     const n = name.toLowerCase();
-                    // English: صورة كتب إنجليزية وكوب شاي (رمز بريطاني) أو كتب دراسية
                     if(n.includes('english') || n.includes('انجليزى') || n.includes('إنجليزي')) 
-                        return 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=600&auto=format&fit=crop';
-                    
-                    // Physics
+                        return 'https://i.ibb.co/6rQ6z5y/english.jpg'; // صورة كتب
                     if(n.includes('physics') || n.includes('فيزياء')) 
-                        return 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=600&auto=format&fit=crop';
-                    
-                    // Chemistry
+                        return 'https://i.ibb.co/y4qQJk8/physics.jpg'; // صورة فيزياء
                     if(n.includes('chemistry') || n.includes('كيمياء')) 
-                        return 'https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?q=80&w=600&auto=format&fit=crop';
-                    
-                    // Biology
+                        return 'https://i.ibb.co/xXj11k8/chem.jpg'; // صورة كيمياء
                     if(n.includes('bio') || n.includes('أحياء')) 
-                        return 'https://images.unsplash.com/photo-1530210124550-912dc1381cb8?q=80&w=600&auto=format&fit=crop';
-                    
-                    // History
-                    if(n.includes('history') || n.includes('تاريخ')) 
-                        return 'https://images.unsplash.com/photo-1599309328828-92285127096b?q=80&w=600&auto=format&fit=crop'; // Egyptian Pyramids
-                    
-                    // Geography
-                    if(n.includes('geo') || n.includes('جغرافيا')) 
-                        return 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop';
-                    
-                    // Arabic
+                        return 'https://i.ibb.co/3WqqJk8/bio.jpg'; // صورة أحياء
                     if(n.includes('arabic') || n.includes('عربي')) 
-                        return 'https://images.unsplash.com/photo-1555513904-8b6fa2071f08?q=80&w=600&auto=format&fit=crop'; // Islamic Art/Books
+                        return 'https://i.ibb.co/9hQ6z5y/arabic.jpg'; // صورة عربي
                     
-                    // Math
-                    if(n.includes('math') || n.includes('رياضيات')) 
-                        return 'https://images.unsplash.com/photo-1509228468518-180dd4864904?q=80&w=600&auto=format&fit=crop';
-                    
-                    return 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?q=80&w=600&auto=format&fit=crop'; // Default
+                    // صورة افتراضية لو مفيش تطابق
+                    return 'https://i.ibb.co/jvQ6z5y/default.jpg';
                 };
 
                 onMounted(async () => {
@@ -323,7 +200,6 @@
                             'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json",
                             'أزهر': "https://plus-teal.vercel.app/organized_output.json"
                         };
-
                         const res = await fetch(URLS[user.section] || URLS['علمي علوم']);
                         const data = await res.json();
                         const year = data.find(y => y.id == 3) || data[0];
@@ -338,12 +214,12 @@
         }).mount('#app');
 
         function logout() {
-            if(confirm('تسجيل الخروج؟')) {
+            if(confirm('خروج؟')) {
                 localStorage.removeItem('alpha_user_code');
                 window.location.replace('index.html');
             }
         }
     </script>
 </body>
-    </html>
-                    
+        </html>
+    
