@@ -3,66 +3,186 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام FULL MARK | الصفحة الشخصية</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <title>الملف الشخصي | FULL MARK</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="auth.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body { 
+            background-color: #000; 
+            color: white; 
+            font-family: 'Cairo', sans-serif; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center;
+        }
+
+        /* التاج الذهبي المتوهج */
+        .crown-glow {
+            font-size: 3.5rem;
+            color: #fbbf24;
+            filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.6));
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+
+        /* الكارت الأزرق المتوهج */
+        .glow-card {
+            background: #020617;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.2), inset 0 0 20px rgba(59, 130, 246, 0.1);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* خط علوي ملون */
+        .top-line {
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, #fbbf24, #3b82f6);
+            width: 100%;
+            position: absolute; top: 0; left: 0;
+        }
+
+        /* مربعات العداد */
+        .timer-box {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 12px;
+            padding: 15px 10px;
+            min-width: 70px;
+            text-align: center;
+        }
+        .timer-num {
+            font-size: 1.8rem; font-weight: bold; color: #60a5fa;
+            font-family: monospace; text-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        .timer-label { font-size: 0.75rem; color: #94a3b8; margin-top: 5px; }
+
+        /* زر العودة */
+        .btn-back {
+            background: linear-gradient(to right, #2563eb, #1d4ed8);
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            transition: 0.3s;
+        }
+        .btn-back:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(37, 99, 235, 0.6); }
+
+        /* كود الطالب */
+        .code-text {
+            color: #fbbf24;
+            font-size: 2rem;
+            font-weight: bold;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);
+            font-family: monospace;
+        }
+    </style>
 </head>
 <body>
-    <div class="background-overlay"></div>
 
-    <header>
-        <div class="user-info">
-            <img src="user-avatar.png" alt="صورة المستخدم" class="user-avatar">
-            <div class="user-details">
-                <h1>احمد محمد</h1>
-                <span class="user-title">🎓 بطل الـ FULL MARK</span>
-            </div>
+    <div class="w-full max-w-sm p-4 text-center">
+        
+        <div class="mb-6">
+            <i class="fas fa-crown crown-glow mb-4"></i>
+            <h1 class="text-3xl font-black text-white tracking-wider mb-1">FULL MARK</h1>
+            <h2 class="text-2xl font-black text-white tracking-wider mb-2">STUDENT</h2>
+            <h3 id="pName" class="text-xl font-bold text-blue-500">...</h3>
         </div>
-        <div class="header-buttons">
-            <button class="crown-btn">👑</button>
-            <button class="power-btn">⏻</button>
+
+        <div class="glow-card p-6 mb-8">
+            <div class="top-line"></div>
+            
+            <div class="flex justify-between items-center mb-8 px-2">
+                <span class="text-gray-400 text-sm">الحالة: بريميوم</span>
+                <span id="statusBadge" class="bg-green-500/10 text-green-400 border border-green-500/30 px-4 py-1 rounded-full text-sm font-bold flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i> نشط
+                </span>
+            </div>
+
+            <h3 class="text-xl font-bold text-white mb-6">الوقت المتبقي</h3>
+
+            <div class="flex justify-center gap-3 mb-8" dir="ltr">
+                <div class="timer-box">
+                    <div class="timer-num" id="dDays">00</div>
+                    <div class="timer-label">أيام</div>
+                </div>
+                <div class="self-center text-2xl text-gray-600">:</div>
+                <div class="timer-box">
+                    <div class="timer-num" id="dHours">00</div>
+                    <div class="timer-label">ساعات</div>
+                </div>
+                <div class="self-center text-2xl text-gray-600">:</div>
+                <div class="timer-box">
+                    <div class="timer-num" id="dMins">00</div>
+                    <div class="timer-label">دقائق</div>
+                </div>
+            </div>
+
+            <button onclick="window.history.back()" class="btn-back w-full py-3 rounded-xl text-white font-bold flex items-center justify-center gap-2">
+                <i class="fas fa-door-open"></i> العودة إلى المواد
+            </button>
         </div>
-    </header>
 
-    <main>
-        <h2 class="main-title">نظام FULL MARK</h2>
-        <p class="subtitle">مسارك للتفوق</p>
-
-        <div class="subjects-grid">
-            <div class="subject-card arabic">
-                <div class="card-content">
-                    <h3>لغة عربية</h3>
-                    <span class="teachers-count">👨‍🏫 2 معلمين</span>
-                </div>
-            </div>
-
-            <div class="subject-card english">
-                <div class="card-content">
-                    <h3>English</h3>
-                    <span class="teachers-count">👨‍🏫 5 معلمين</span>
-                </div>
-            </div>
-
-            <div class="subject-card physics">
-                <div class="card-content">
-                    <h3>فيزياء</h3>
-                    <span class="teachers-count">👨‍🏫 4 معلمين</span>
-                </div>
-            </div>
-
-            <div class="subject-card chemistry">
-                <div class="card-content">
-                    <h3>كيمياء</h3>
-                    <span class="teachers-count">👨‍🏫 5 معلمين</span>
-                </div>
-            </div>
+        <div>
+            <p class="text-gray-500 text-sm mb-2">كود التفعيل الخاص بك</p>
+            <div id="pCode" class="code-text">------</div>
         </div>
-    </main>
 
-    <footer>
-        ELGIZAWY DEVELOPMENT
-    </footer>
+    </div>
+
+    <script>
+        const code = checkAuth();
+        if(!code) window.location.href = 'index.html';
+
+        document.getElementById('pCode').innerText = code;
+        const db = firebase.database();
+
+        db.ref('approvedStudents/'+code).once('value', snap => {
+            const u = snap.val();
+            if(u) {
+                document.getElementById('pName').innerText = u.studentName;
+                startTimer(u.expiryDate, u.isBlocked);
+            }
+        });
+
+        function startTimer(expiry, isBlocked) {
+            const badge = document.getElementById('statusBadge');
+            
+            // لو محظور
+            if (isBlocked) {
+                badge.className = "bg-red-500/10 text-red-400 border border-red-500/30 px-4 py-1 rounded-full text-sm font-bold flex items-center gap-2";
+                badge.innerHTML = '<i class="fas fa-ban"></i> محظور';
+                return;
+            }
+
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const diff = expiry - now;
+
+                if (diff < 0) {
+                    clearInterval(timer);
+                    badge.className = "bg-red-500/10 text-red-400 border border-red-500/30 px-4 py-1 rounded-full text-sm font-bold flex items-center gap-2";
+                    badge.innerHTML = '<i class="fas fa-times-circle"></i> منتهي';
+                    ['dDays', 'dHours', 'dMins'].forEach(id => document.getElementById(id).innerText = "00");
+                    return;
+                }
+
+                const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+                document.getElementById('dDays').innerText = d < 10 ? "0"+d : d;
+                document.getElementById('dHours').innerText = h < 10 ? "0"+h : h;
+                document.getElementById('dMins').innerText = m < 10 ? "0"+m : m;
+            }, 1000);
+        }
+    </script>
 </body>
-</html>
+    </html>
+    
