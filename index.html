@@ -2,198 +2,364 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FULL MARK | تسجيل الدخول</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تسجيل الدخول | FULL MARK</title>
     
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="description" content="منصة Full Mark التعليمية - مسارك للتفوق.">
+    <meta name="keywords" content="Full Mark, Elgizawy, تعليم, ثانوية عامة, منصة">
+    <meta name="author" content="Elgizawy">
+
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
+        /* 🎨 تعريف ألوان منصة FULL MARK */
+        :root {
+            --primary-blue: #3b82f6;      /* الأزرق الأساسي */
+            --primary-glow: #60a5fa;      /* توهج أزرق */
+            --accent-gold: #fbbf24;       /* الذهبي (التاج والنجوم) */
+            --bg-dark: #020617;           /* الخلفية الداكنة */
+            --glass-bg: rgba(30, 41, 59, 0.6); /* خلفية الكارت الزجاجي */
+            --glass-border: rgba(99, 102, 241, 0.3); /* حدود الكارت */
+            --error-red: #ef4444;
+            --success-green: #10b981;
+        }
+
+        * {
+            margin: 0; padding: 0; box-sizing: border-box;
+            font-family: 'Tajawal', sans-serif;
+        }
+
         body {
-            background-color: #020617;
-            background-image: 
-                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
-                radial-gradient(at 50% 0%, hsla(230,50%,15%,1) 0, transparent 50%), 
-                radial-gradient(at 100% 0%, hsla(280,50%,15%,1) 0, transparent 50%);
-            color: white; font-family: 'Tajawal', sans-serif;
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-            overflow: hidden; margin: 0;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            min-height: 100vh;
+            /* خلفية متدرجة (فضائية) */
+            background: radial-gradient(circle at 50% 0%, #1e1b4b, #020617 90%);
+            overflow: hidden; color: white;
+            padding: 20px;
         }
 
-        .glass-card {
-            background: rgba(15, 23, 42, 0.6);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 32px;
-            padding: 45px 35px;
-            width: 90%; max-width: 400px;
+        /* 🌌 تأثير النجوم الخلفية */
+        .stars-bg {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
+        }
+        .star {
+            position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
+            box-shadow: 0 0 4px rgba(255,255,255,0.8);
+            animation: twinkle var(--duration) infinite ease-in-out; opacity: 0;
+        }
+        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
+
+        /* 🌠 تأثير الشهب */
+        .shooting-star {
+            position: absolute; width: 4px; height: 4px; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--primary-blue);
+            opacity: 0; transform: rotateZ(315deg); animation: shoot 6s linear infinite; z-index: -1;
+        }
+        @keyframes shoot {
+            0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
+            10% { opacity: 1; }
+            100% { opacity: 0; transform: translate3d(500px, 500px, 0) rotateZ(315deg); }
+        }
+
+        /* 💳 كارت تسجيل الدخول */
+        .login-card {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%; max-width: 400px;
             text-align: center;
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.6);
-            animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            animation: floatUp 0.8s ease-out;
+            position: relative; overflow: hidden;
         }
 
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+        /* خط علوي ملون للكارت */
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold), var(--primary-blue));
         }
 
-        .logo-text {
-            font-family: 'Outfit', sans-serif;
-            font-size: 3.2rem; font-weight: 900;
-            background: linear-gradient(135deg, #fff 30%, #6366f1 70%, #d946ef 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px; letter-spacing: -1px;
-            filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.3));
-        }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        .input-group { position: relative; margin-bottom: 25px; }
-        
-        .input-field {
-            width: 100%; padding: 18px 20px 18px 55px;
-            background: rgba(2, 6, 23, 0.6);
-            border: 1px solid rgba(99, 102, 241, 0.2);
+        /* 👑 العناوين */
+        h2 {
+            font-family: 'Cairo', sans-serif;
+            margin-bottom: 10px; font-size: 2rem; font-weight: 900;
+            background: linear-gradient(to right, #fff, var(--primary-glow));
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; font-weight: bold; }
+
+        /* ⌨️ حقول الإدخال */
+        .input-group { position: relative; margin-bottom: 20px; }
+        .input-group input {
+            width: 100%; padding: 16px 50px 16px 20px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 16px;
-            color: white; font-size: 1.1rem; outline: none; transition: 0.4s;
-            text-align: center; font-family: 'Outfit', sans-serif;
+            color: white; font-size: 1.1rem; letter-spacing: 2px;
+            text-align: center; outline: none; transition: 0.3s;
+            font-family: monospace; font-weight: bold;
         }
-
-        .input-field:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
-            background: rgba(2, 6, 23, 0.8);
+        .input-group input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            background: rgba(15, 23, 42, 0.9);
         }
-
-        .input-icon {
+        .input-group .icon {
             position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            color: #6366f1; font-size: 1.3rem; opacity: 0.8;
+            color: var(--primary-blue); font-size: 1.2rem;
         }
 
-        .btn-primary {
-            width: 100%; padding: 18px;
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
-            border: none; border-radius: 16px;
-            color: white; font-weight: 800; font-size: 1.2rem;
-            cursor: pointer; transition: 0.4s;
-            box-shadow: 0 15px 30px rgba(99, 102, 241, 0.3);
+        /* 🚀 زر الدخول */
+        .login-btn {
+            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-blue), #4f46e5);
+            color: white; font-size: 1.1rem; font-weight: 800;
+            cursor: pointer; transition: 0.3s;
+            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+        }
+        .login-btn:hover {
+            transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(79, 70, 229, 0.6);
+        }
+        .login-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+        /* 🔔 رسائل الحالة */
+        #statusMessage {
+            margin-bottom: 20px; padding: 12px; border-radius: 12px;
+            font-size: 0.9rem; font-weight: bold; display: none;
         }
 
-        .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 20px 40px rgba(99, 102, 241, 0.4); }
-        .btn-primary:active { transform: scale(0.97); }
-        
-        .loader {
-            display: none; width: 24px; height: 24px; 
-            border: 3px solid #FFF; border-bottom-color: transparent; 
-            border-radius: 50%; animation: rotation 1s linear infinite;
+        /* 🛠️ شريط الحالة العلوي (للكود المسجل) */
+        .top-status-bar {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 16px; padding: 15px; margin-bottom: 25px;
+            display: none; flex-direction: column; align-items: center; gap: 10px;
         }
-        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .code-display { color: var(--accent-gold); font-family: monospace; font-size: 1.2rem; letter-spacing: 2px; }
+        .clear-btn {
+            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
+        }
+        .clear-btn:hover { background: rgba(239, 68, 68, 0.3); color: white; }
 
-        .dev-tag { margin-top: 30px; font-size: 0.7rem; color: #64748b; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
-        .dev-name { color: #818cf8; font-family: 'Outfit', sans-serif; }
+        /* 👨‍💻 Footer المطور */
+        .developer-footer {
+            position: fixed; bottom: 20px; width: 100%;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 10;
+        }
+        .dev-badge {
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(5px);
+            padding: 8px 20px; border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex; align-items: center; gap: 10px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+        .dev-name { color: var(--accent-gold); font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
+        .dev-role { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
     </style>
 </head>
 <body>
 
-    <div class="glass-card">
-        <div class="mb-10">
-            <h1 class="logo-text">FULL MARK</h1>
-            <p class="text-gray-400 text-[10px] tracking-[0.4em] uppercase font-bold">E-Learning Ecosystem</p>
-        </div>
-
-        <form id="loginForm" onsubmit="handleLogin(event)">
-            <div class="input-group">
-                <i class="fas fa-key input-icon"></i>
-                <input type="text" id="code" class="input-field" placeholder="كود تفعيل الطالب" required autocomplete="off">
-            </div>
-
-            <button type="submit" id="loginBtn" class="btn-primary flex items-center justify-center">
-                <span id="btnText">دخول المنصة</span>
-                <span id="spinner" class="loader"></span>
-            </button>
-        </form>
-
-        <div id="errorMsg" class="mt-5 text-red-400 text-sm hidden font-bold bg-red-400/10 p-3 rounded-xl border border-red-400/20"></div>
-        
-        <div class="dev-tag">
-            Developed by <span class="dev-name">ELGIZAWY</span>
-        </div>
+    <div class="stars-bg">
+        <div class="star" style="top:10%; left:20%; --duration:3s"></div>
+        <div class="star" style="top:50%; left:80%; --duration:5s"></div>
+        <div class="star" style="top:80%; left:30%; --duration:4s"></div>
+        <div class="star" style="top:30%; left:50%; --duration:6s"></div>
     </div>
 
+    <div class="login-card">
+        
+        <div id="topCodeStatus" class="top-status-bar"></div>
+
+        <div class="mb-6">
+            <i class="fas fa-crown text-4xl text-yellow-400 mb-2 drop-shadow-lg"></i>
+            <h2>FULL MARK</h2>
+            <p class="subtitle">بوابتك الأولى للتفوق الدراسي</p>
+        </div>
+
+        <div id="statusMessage"></div>
+
+        <form id="loginForm">
+            <div class="input-group">
+                <i class="fas fa-key icon"></i>
+                <input type="text" id="activationCode" placeholder="كود التفعيل" maxlength="15" autocomplete="off" required>
+            </div>
+
+            <button type="submit" id="loginBtn" class="login-btn">
+                دخول المنصة <i class="fas fa-rocket mr-2"></i>
+            </button>
+        </form>
+    </div>
+    
+    <footer class="developer-footer">
+        <div class="dev-badge">
+            <span class="dev-role">Developed By</span>
+            <span class="dev-name">ELGIZAWY</span>
+        </div>
+    </footer>
+
     <script>
-        // إعدادات Firebase
-        const firebaseConfig = { databaseURL: "https://fullmark-2025-default-rtdb.firebaseio.com" };
-        if (!firebase.apps.length) {
+        // 🚨 إعدادات Firebase الخاصة بمنصة FULL MARK 2025
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1QB3qaFfkGYq0OWOEAr83V25NAPFwxzs",
+            authDomain: "fullmark-2025.firebaseapp.com",
+            databaseURL: "https://fullmark-2025-default-rtdb.firebaseio.com",
+            projectId: "fullmark-2025",
+            storageBucket: "fullmark-2025.firebasestorage.app",
+            messagingSenderId: "963956202032",
+            appId: "1:963956202032:web:4df914457d79b75dee2bf5"
+        };
+        
+        // تهيئة الفايربيس
+        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
             firebase.initializeApp(firebaseConfig);
         }
         const db = firebase.database();
 
-        // التوجيه التلقائي إذا كان مسجل دخول مسبقاً
-        if(localStorage.getItem('alpha_user_code')) {
-            window.location.replace('subjects.html');
+        // عناصر الواجهة
+        const STATUS_MESSAGE = document.getElementById('statusMessage');
+        const LOGIN_FORM = document.getElementById('loginForm');
+        const LOGIN_BTN = document.getElementById('loginBtn');
+        const CODE_INPUT = document.getElementById('activationCode');
+        const CODE_STATUS = document.getElementById('topCodeStatus');
+
+        // دالة عرض الرسائل
+        function showMsg(text, type) {
+            STATUS_MESSAGE.textContent = text;
+            STATUS_MESSAGE.style.display = 'block';
+            STATUS_MESSAGE.className = ''; // reset
+            
+            if (type === 'success') {
+                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.2)';
+                STATUS_MESSAGE.style.color = '#34d399';
+                STATUS_MESSAGE.style.border = '1px solid #10b981';
+            } else if (type === 'error') {
+                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.2)';
+                STATUS_MESSAGE.style.color = '#f87171';
+                STATUS_MESSAGE.style.border = '1px solid #ef4444';
+            } else {
+                STATUS_MESSAGE.style.background = 'rgba(59, 130, 246, 0.2)';
+                STATUS_MESSAGE.style.color = '#60a5fa';
+                STATUS_MESSAGE.style.border = '1px solid #3b82f6';
+            }
         }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const codeInput = document.getElementById('code').value.trim();
-            const btnText = document.getElementById('btnText');
-            const spinner = document.getElementById('spinner');
-            const errorDiv = document.getElementById('errorMsg');
+        // توليد معرف الجهاز
+        function getDeviceID() {
+            let did = localStorage.getItem('localDeviceId');
+            if (!did) {
+                did = 'DID-' + Math.random().toString(36).substring(2, 10).toUpperCase() + Date.now().toString(36);
+                localStorage.setItem('localDeviceId', did);
+            }
+            return did;
+        }
 
-            // بدء حالة التحميل
-            btnText.style.display = 'none';
-            spinner.style.display = 'inline-block';
-            errorDiv.classList.add('hidden');
+        // حذف الكود
+        window.clearLocalCode = function() {
+            if(confirm('هل أنت متأكد من حذف الكود وتسجيل الخروج؟')) {
+                localStorage.removeItem('alpha_user_code');
+                localStorage.removeItem('is_active');
+                window.location.reload();
+            }
+        };
+
+        // التحقق التلقائي عند فتح الصفحة
+        const savedCode = localStorage.getItem('alpha_user_code');
+        if (savedCode) {
+            LOGIN_FORM.style.display = 'none';
+            CODE_STATUS.style.display = 'flex';
+            CODE_STATUS.innerHTML = `
+                <span style="color:#cbd5e1; font-size:0.9rem">أنت مسجل دخول بالكود:</span>
+                <span class="code-display">${savedCode}</span>
+                <div style="display:flex; gap:10px; margin-top:10px">
+                    <button class="login-btn" style="padding:8px 20px; font-size:0.9rem" onclick="window.location.href='subjects.html'">دخول مباشر</button>
+                    <button class="clear-btn" onclick="clearLocalCode()">خروج</button>
+                </div>
+            `;
+            
+            // تحقق صامت في الخلفية
+            checkCodeValidity(savedCode, true);
+        }
+
+        // منطق تسجيل الدخول
+        LOGIN_FORM.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const code = CODE_INPUT.value.trim();
+            if (code.length < 3) return showMsg('⚠️ يرجى كتابة كود صحيح', 'error');
+            checkCodeValidity(code, false);
+        });
+
+        async function checkCodeValidity(code, isAuto) {
+            if (!isAuto) {
+                LOGIN_BTN.disabled = true;
+                LOGIN_BTN.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري التحقق...';
+                showMsg('جاري الاتصال بالسيرفر...', 'pending');
+            }
 
             try {
-                // جلب بيانات الطالب من Firebase
-                const snapshot = await db.ref('approvedStudents/' + codeInput).once('value');
-                const student = snapshot.val();
+                const snap = await db.ref('approvedStudents/' + code).once('value');
+                const data = snap.val();
+                const deviceId = getDeviceID();
+                const now = Date.now();
 
-                if (!student) throw "كود الطالب غير صحيح، يرجى مراجعة الإدارة.";
+                if (!data) throw new Error("الكود غير صحيح");
+                if (data.expiryDate && data.expiryDate <= now) throw new Error("انتهت صلاحية هذا الكود");
+                if (data.isBlocked) throw new Error("تم حظر هذا الكود، تواصل مع الدعم");
                 
-                // 1. فحص الحظر
-                if (student.isBlocked) throw "عفواً، تم حظر هذا الكود من الوصول.";
-
-                // 2. فحص تاريخ الانتهاء
-                const now = new Date().getTime();
-                if (student.expiryDate && now > student.expiryDate) {
-                    throw "انتهت صلاحية هذا الكود، يرجى التجديد.";
+                // التحقق من الجهاز
+                if (data.deviceId && data.deviceId !== deviceId) {
+                    throw new Error("هذا الكود مفعل على جهاز آخر! لا يمكن الدخول.");
                 }
 
-                // 3. نظام البصمة للجهاز
-                let deviceId = localStorage.getItem('alpha_device_id');
-                if (!deviceId) {
-                    // إنشاء بصمة فريدة للجهاز إذا لم تكن موجودة
-                    deviceId = 'FM-' + Math.random().toString(36).substr(2, 9).toUpperCase() + '-' + Date.now().toString(36).toUpperCase();
-                    localStorage.setItem('alpha_device_id', deviceId);
+                // تفعيل الجهاز إذا كان أول مرة
+                if (!data.deviceId) {
+                    await db.ref('approvedStudents/' + code).update({ deviceId: deviceId });
                 }
 
-                // التحقق من تطابق الجهاز
-                if (student.deviceId && student.deviceId !== deviceId) {
-                    throw "هذا الكود مرتبط بجهاز آخر بالفعل! 📱🚫";
-                }
-
-                // ربط الكود بالجهاز في أول مرة دخول
-                if (!student.deviceId) {
-                    await db.ref('approvedStudents/' + codeInput).update({ deviceId: deviceId });
-                }
-
-                // نجاح الدخول - حفظ الجلسة
-                localStorage.setItem('alpha_user_code', codeInput);
+                // نجاح الدخول
+                localStorage.setItem('alpha_user_code', code);
                 
-                // الانتقال لصفحة المواد
-                window.location.replace('subjects.html');
+                if (!isAuto) {
+                    showMsg('✅ تم التفعيل بنجاح! جاري الدخول...', 'success');
+                    setTimeout(() => window.location.href = 'subjects.html', 1500);
+                }
 
             } catch (err) {
-                errorDiv.textContent = err;
-                errorDiv.classList.remove('hidden');
-                btnText.style.display = 'inline';
-                spinner.style.display = 'none';
+                showMsg('❌ ' + (err.message || 'حدث خطأ'), 'error');
+                if (isAuto) {
+                    // لو التحقق التلقائي فشل، نرجع الفورم
+                    localStorage.removeItem('alpha_user_code');
+                    CODE_STATUS.style.display = 'none';
+                    LOGIN_FORM.style.display = 'block';
+                }
+            } finally {
+                if (!isAuto) {
+                    LOGIN_BTN.disabled = false;
+                    LOGIN_BTN.innerHTML = 'دخول المنصة <i class="fas fa-rocket mr-2"></i>';
+                }
             }
+        }
+
+        // إنشاء شهب عشوائية
+        const body = document.querySelector('body');
+        for (let i = 0; i < 5; i++) {
+            const star = document.createElement('div');
+            star.className = 'shooting-star';
+            star.style.left = Math.random() * 100 + '%';
+            star.style.top = Math.random() * 50 + '%';
+            star.style.animationDelay = Math.random() * 5 + 's';
+            body.appendChild(star);
         }
     </script>
 </body>
