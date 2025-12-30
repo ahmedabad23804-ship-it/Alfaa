@@ -220,7 +220,8 @@
                     // بحث في مجلد more_images
                     if (name.includes('english') || name.includes('انجليزي')) return IMAGES_DB["english"];
                     if (name.includes('جغرافيا') || name.includes('geo')) return IMAGES_DB["geo"];
-                    if (name.includes('فرنساوي') || name.includes('french')) return IMAGES_DB["french"];
+                    // ✅ تم التعديل هنا: إضافة français و le français
+                    if (name.includes('فرنساوي') || name.includes('french') || name.includes('français')) return IMAGES_DB["french"];
                     if (name.includes('إحصاء') || name.includes('stats')) return IMAGES_DB["stats"];
 
                     // الجيولوجيا (تستخدم صورة الفيزياء مؤقتاً لو مش موجودة)
