@@ -15,16 +15,15 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        /* إعدادات الخلفية والألوان */
         body { 
-            background: #050a18; /* كحلي غامق جداً */
+            background: #050a18; 
             color: white; 
             font-family: 'Cairo', sans-serif; 
             min-height: 100vh; 
+            padding-bottom: 80px; 
             overflow-x: hidden; 
         }
 
-        /* تأثير الإضاءة الخلفية */
         .bg-glow { 
             position: fixed; top: -20%; left: 50%; transform: translateX(-50%); 
             width: 150%; height: 600px; 
@@ -32,21 +31,16 @@
             z-index: -1; pointer-events: none;
         }
 
-        /* الهيدر الجديد */
         .header-container {
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 25px;
-            margin-bottom: 10px;
+            padding: 20px 25px; margin-bottom: 10px;
         }
 
         .icon-btn {
-            width: 50px; height: 50px;
-            border-radius: 18px;
-            background: #111526;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            width: 50px; height: 50px; border-radius: 18px;
+            background: #111526; border: 1px solid rgba(255, 255, 255, 0.05);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; color: #5b6a8e;
-            transition: 0.3s; cursor: pointer;
+            font-size: 1.4rem; color: #5b6a8e; transition: 0.3s; cursor: pointer;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
         .icon-btn.power:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
@@ -67,7 +61,6 @@
             background: #22c55e; border: 2px solid #111526; border-radius: 50%;
         }
 
-        /* العناوين */
         .main-title { text-align: center; margin-bottom: 40px; }
         .title-text {
             font-size: 2.2rem; font-weight: 900; color: #a5b4fc;
@@ -82,89 +75,62 @@
             width: 40px; height: 3px; background: #6366f1; border-radius: 2px;
         }
 
-        /* كروت المواد */
         .subject-card {
-            background: #10152a;
-            border-radius: 35px;
-            padding: 0;
-            text-align: center;
-            height: 280px;
+            background: #10152a; border-radius: 35px; padding: 0;
+            text-align: center; height: 280px;
             display: flex; flex-direction: column; align-items: center;
-            border: 1px solid transparent;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid transparent; transition: all 0.4s;
             cursor: pointer; position: relative; overflow: hidden;
         }
-        
         .subject-card:hover {
-            transform: translateY(-10px);
-            border-color: #3b4566;
-            background: #151b33;
-            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
+            transform: translateY(-10px); border-color: #3b4566;
+            background: #151b33; box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
-        /* حاوية الصورة */
         .s-img-container {
-            width: 100%; height: 160px;
-            overflow: hidden;
-            position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            width: 100%; height: 160px; overflow: hidden; position: relative;
+            background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-        
         .s-img { 
-            width: 100%; height: 100%; 
-            object-fit: cover;
-            transition: 0.5s;
-            filter: brightness(0.8);
+            width: 100%; height: 100%; object-fit: cover;
+            transition: 0.5s; filter: brightness(0.8);
         }
         .subject-card:hover .s-img { transform: scale(1.1); filter: brightness(1); }
 
         .card-content {
-            padding: 15px;
-            width: 100%;
+            padding: 15px; width: 100%;
             display: flex; flex-direction: column; align-items: center; justify-content: space-between;
             flex-grow: 1;
         }
-
         .s-name { font-size: 1.4rem; font-weight: 800; color: white; margin-bottom: 5px; }
 
         .teacher-badge {
             background: #1e2540; color: #94a3b8;
             padding: 6px 14px; border-radius: 12px;
             font-size: 0.75rem; font-weight: 700;
-            display: flex; align-items: center; gap: 6px;
-            transition: 0.3s;
+            display: flex; align-items: center; gap: 6px; transition: 0.3s;
         }
         .subject-card:hover .teacher-badge { background: #6366f1; color: white; }
 
         .skeleton { background: #111526; border-radius: 35px; animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
         
-        /* الحقوق (تم التعديل لتصبح في الأسفل وليست ثابتة) */
         .footer-brand {
-            text-align: center;
-            margin-top: 50px;
-            padding: 20px;
-            font-size: 0.8rem;
-            font-weight: 900;
-            letter-spacing: 3px;
-            color: #334155;
-            text-transform: uppercase;
-            border-top: 1px solid rgba(255, 255, 255, 0.02);
+            text-align: center; margin-top: 50px; padding: 20px;
+            font-size: 0.8rem; font-weight: 900; letter-spacing: 3px; color: #334155;
+            text-transform: uppercase; border-top: 1px solid rgba(255, 255, 255, 0.02);
         }
     </style>
 </head>
 <body>
-
     <div class="bg-glow"></div>
 
     <div id="app">
-        
         <header class="header-container">
             <div class="flex gap-3">
                 <div @click="logout" class="icon-btn power"><i class="fas fa-power-off"></i></div>
                 <a href="profile.html" class="icon-btn crown"><i class="fas fa-crown"></i></a>
             </div>
-
             <div class="profile-area">
                 <div class="text-right">
                     <h2 class="text-white font-bold text-sm leading-tight" id="sName">...</h2>
@@ -183,18 +149,15 @@
         </div>
 
         <div class="px-6 max-w-7xl mx-auto">
-            
             <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="i in 3" class="skeleton h-[280px]"></div>
             </div>
 
             <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div v-for="s in subjects" :key="s.id" @click="go(s)" class="subject-card group">
-                    
                     <div class="s-img-container">
-                        <img :src="getImg(s.name)" class="s-img" loading="lazy">
+                        <img :src="getImg(s.name)" class="s-img" loading="lazy" onerror="this.src='images/default.jpg'">
                     </div>
-
                     <div class="card-content">
                         <h3 class="s-name">{{ s.name }}</h3>
                         <div class="teacher-badge">
@@ -202,7 +165,6 @@
                             <span>{{ s.teachers ? s.teachers.length : 0 }} معلمين</span>
                         </div>
                     </div>
-
                 </div>
             </div>
 
@@ -210,26 +172,25 @@
                 <i class="fas fa-box-open text-4xl mb-2"></i>
                 <p>لا توجد مواد متاحة حالياً</p>
             </div>
-
         </div>
 
         <div class="footer-brand">ELGIZAWY • DEVELOPMENT</div>
     </div>
 
     <script>
-        // صور حقيقية
+        // ✅ قائمة الملفات المحلية: لازم تسمي صورك بنفس الأسماء دي بالظبط وتحطها في فولدر اسمه images
         const IMAGES_DB = {
-            "فيزياء": "https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=600&auto=format&fit=crop",
-            "كيمياء": "https://images.unsplash.com/photo-1603126857599-f6e157fa2fe6?q=80&w=600&auto=format&fit=crop",
-            "أحياء": "https://images.unsplash.com/photo-1530210124550-912dc1381cb8?q=80&w=600&auto=format&fit=crop",
-            "لغة عربية": "https://images.unsplash.com/photo-1555513904-8b6fa2071f08?q=80&w=600&auto=format&fit=crop",
-            "English": "https://images.unsplash.com/photo-1543002588-bfa74002ed7e?q=80&w=600&auto=format&fit=crop",
-            "رياضيات": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=600&auto=format&fit=crop",
-            "تاريخ": "https://images.unsplash.com/photo-1568684333877-4d39f2c871c9?q=80&w=600&auto=format&fit=crop",
-            "جغرافيا": "https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=600&auto=format&fit=crop",
-            "فرنساوي": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=600&auto=format&fit=crop",
-            "جيولوجيا": "https://images.unsplash.com/photo-1616885312388-34440c49122c?q=80&w=600&auto=format&fit=crop",
-            "default": "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=600&auto=format&fit=crop"
+            "لغة عربية": "images/arabic.jpg",
+            "English": "images/english.jpg",
+            "فيزياء": "images/physics.jpg",
+            "كيمياء": "images/chemistry.jpg",
+            "أحياء": "images/biology.jpg",
+            "رياضيات": "images/math.jpg",
+            "تاريخ": "images/history.jpg",
+            "جغرافيا": "images/geo.jpg",
+            "فرنساوي": "images/french.jpg",
+            "جيولوجيا": "images/geo_science.jpg",
+            "default": "images/default.jpg" // صورة احتياطية
         };
 
         const { createApp, ref, onMounted } = Vue;
@@ -241,7 +202,17 @@
                 const yid = ref(null);
 
                 const getImg = (n) => {
-                    for(let key in IMAGES_DB) if(n.toLowerCase().includes(key.toLowerCase())) return IMAGES_DB[key];
+                    const name = n.toLowerCase();
+                    if (name.includes('عربي') || name.includes('arabic')) return IMAGES_DB["لغة عربية"];
+                    if (name.includes('english') || name.includes('انجليزي')) return IMAGES_DB["English"];
+                    if (name.includes('فيزياء') || name.includes('physics')) return IMAGES_DB["فيزياء"];
+                    if (name.includes('كيمياء') || name.includes('chemistry')) return IMAGES_DB["كيمياء"];
+                    if (name.includes('أحياء') || name.includes('biology')) return IMAGES_DB["أحياء"];
+                    if (name.includes('رياضيات') || name.includes('math')) return IMAGES_DB["رياضيات"];
+                    if (name.includes('تاريخ') || name.includes('history')) return IMAGES_DB["تاريخ"];
+                    if (name.includes('جغرافيا') || name.includes('geo')) return IMAGES_DB["جغرافيا"];
+                    if (name.includes('فرنساوي') || name.includes('french')) return IMAGES_DB["فرنساوي"];
+                    if (name.includes('جيولوجيا')) return IMAGES_DB["جيولوجيا"];
                     return IMAGES_DB['default'];
                 };
 
@@ -287,6 +258,7 @@
 
                     } catch (e) { 
                         console.error(e);
+                        // fallback
                         const fallbackRes = await fetch("https://plus-teal.vercel.app/organized_output.json");
                         const fallbackData = await fallbackRes.json();
                         let year = fallbackData.find(y => y.id == 3);
@@ -301,4 +273,5 @@
         }).mount('#app');
     </script>
 </body>
-</html>
+    </html>
+    
