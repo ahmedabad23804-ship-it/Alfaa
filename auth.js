@@ -18,7 +18,7 @@ if (typeof firebase !== 'undefined' && !firebase.apps.length) {
 
 /**
  * دالة التحقق من الصلاحيات والحظر (Core Security)
- * تعمل بشكل تلقائي في كل الصفحات
+ * تعمل بشكل تلقائي في كل الصفحات وتراقب الحالة لحظياً
  */
 function checkAuth() {
     const code = localStorage.getItem('alpha_user_code');
@@ -26,10 +26,12 @@ function checkAuth() {
     // تحديد اسم الصفحة الحالية
     const path = window.location.pathname;
     const pageName = path.substring(path.lastIndexOf('/') + 1);
-    const isLoginPage = (pageName === 'index.html' || pageName === '');
+    
+    // الصفحات الخاصة
+    const isLoginPage = (pageName === 'index.html' || pageName === '' || pageName === '/');
     const isBlockedPage = (pageName === 'blocked.html');
 
-    // 1. حالة عدم وجود كود مسجل
+    // 1. حالة عدم وجود كود مسجل (لم يسجل دخول)
     if (!code) {
         if (!isLoginPage) {
             window.location.replace('index.html');
@@ -41,11 +43,11 @@ function checkAuth() {
     if (typeof firebase !== 'undefined') {
         const db = firebase.database();
         
-        // استخدام .on بدلاً من .once لمراقبة الحظر لحظياً
+        // استخدام .on لمراقبة أي تغيير يفعله الأدمن لحظياً
         db.ref('approvedStudents/' + code).on('value', (snapshot) => {
             const user = snapshot.val();
 
-            // أ: الكود غير موجود في قاعدة البيانات (تم حذفه)
+            // أ: الكود غير موجود في قاعدة البيانات (تم حذفه من الأدمن)
             if (!user) {
                 localStorage.clear();
                 window.location.replace('index.html');
@@ -54,10 +56,10 @@ function checkAuth() {
 
             // ب: التحقق من الحظر
             if (user.isBlocked === true) {
-                // حفظ الاسم لعرضه في صفحة الحظر
+                // حفظ الاسم لعرضه في رسالة الحظر
                 localStorage.setItem('studentName', user.studentName);
                 
-                // لو الطالب مش في صفحة الحظر -> اطرده لصفحة الحظر فوراً
+                // لو الطالب مش في صفحة الحظر -> اطرده لصفحة "تم حظرك" فوراً
                 if (!isBlockedPage) {
                     window.location.replace('blocked.html');
                 }
@@ -65,8 +67,9 @@ function checkAuth() {
             else {
                 // ج: الطالب سليم (غير محظور)
                 
-                // لو كان في صفحة الحظر (وتم فك الحظر عنه) -> رجعه للمواد
+                // لو كان في صفحة الحظر (وتم فك الحظر عنه الآن)
                 if (isBlockedPage) {
+                    alert("تم فك الحظر، نورت يا بطل! 😉");
                     window.location.replace('subjects.html');
                 }
                 
@@ -91,6 +94,9 @@ function logout() {
         localStorage.removeItem('studentName');
         localStorage.removeItem('activeLecture');
         
+        // ملاحظة: لا نمسح بصمة الجهاز (Device ID) لمنع التحايل
+        // localStorage.removeItem('FULLMARK_DEVICE_ID'); 
+        
         // توجيه فوري لصفحة الدخول
         window.location.replace('index.html');
     }
@@ -98,4 +104,3 @@ function logout() {
 
 // تشغيل نظام الحماية تلقائياً عند تحميل الملف
 checkAuth();
-    
