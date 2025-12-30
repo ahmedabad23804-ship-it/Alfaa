@@ -20,23 +20,16 @@
             position: relative; background: radial-gradient(circle at center, #1e1b4b 0%, #020617 100%);
         }
 
-        /* تخصيص ألوان Plyr */
         :root {
             --plyr-color-main: #6366f1;
             --plyr-video-background: transparent;
             --plyr-menu-background: rgba(15, 23, 42, 0.95);
             --plyr-menu-color: #f8fafc;
-            --plyr-menu-border-color: rgba(99, 102, 241, 0.2);
-        }
-
-        .plyr__control--overlaid {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(217, 70, 239, 0.9)) !important;
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.4);
         }
 
         /* زر الرجوع */
         .back-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 50;
+            position: absolute; top: 20px; right: 20px; z-index: 60;
             width: 45px; height: 45px; border-radius: 15px;
             background: rgba(15, 23, 42, 0.6); color: white;
             display: flex; align-items: center; justify-content: center;
@@ -45,124 +38,103 @@
         }
         .back-btn:hover { background: #6366f1; transform: scale(1.1); }
 
-        /* العلامة المائية المتحركة للحماية */
         .security-watermark {
-            position: absolute;
-            font-size: 1.5rem; font-weight: 900;
-            color: rgba(255, 255, 255, 0.15);
-            pointer-events: none; z-index: 40;
-            white-space: nowrap;
-            animation: floatMove 15s infinite alternate ease-in-out;
+            position: absolute; font-size: 1.5rem; font-weight: 900;
+            color: rgba(255, 255, 255, 0.15); pointer-events: none; z-index: 40;
+            white-space: nowrap; animation: floatMove 15s infinite alternate ease-in-out;
         }
-
         @keyframes floatMove {
             0% { top: 10%; left: 10%; transform: rotate(-5deg); }
-            25% { top: 80%; left: 20%; transform: rotate(5deg); }
-            50% { top: 50%; left: 80%; transform: rotate(-5deg); }
-            75% { top: 20%; left: 60%; transform: rotate(5deg); }
             100% { top: 90%; left: 90%; transform: rotate(-5deg); }
         }
 
-        /* مناطق اللمس المزدوج */
+        /* ✅ تعديل مناطق اللمس المزدوج */
         .dt-zone {
-            position: absolute; top: 0; bottom: 0; width: 30%; z-index: 20;
+            position: absolute; top: 0; 
+            bottom: 80px; /* ✅ أهم تعديل: رفعنا المنطقة عشان متغطيش الزرار */
+            width: 35%; z-index: 50; /* زاد الـ z-index عشان يبقى فوق الفيديو */
             display: flex; align-items: center; justify-content: center;
-            opacity: 0; transition: 0.3s; pointer-events: auto;
+            opacity: 0; transition: 0.2s; pointer-events: auto;
         }
         .dt-left { left: 0; }
         .dt-right { right: 0; }
         
         .tap-icon { 
-            background: rgba(0, 0, 0, 0.6); padding: 20px; border-radius: 50%;
-            backdrop-filter: blur(8px); display: flex; flex-direction: column; 
-            align-items: center; color: white;
+            background: rgba(0, 0, 0, 0.7); padding: 25px; border-radius: 50%;
+            backdrop-filter: blur(5px); display: flex; flex-direction: column; 
+            align-items: center; color: white; transform: scale(0.8);
         }
+
+        /* منع التفاعل مع الـ Double Click الافتراضي لـ Plyr */
+        .plyr--fullscreen-enabled [data-plyr="fullscreen"] { display: block !important; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div onclick="history.back()" class="back-btn"><i class="fas fa-arrow-right"></i></div>
-
     <div id="watermark" class="security-watermark">Loading ID...</div>
 
     <div class="video-wrapper">
-        <div id="player-container" class="w-full max-w-5xl"></div>
+        <div id="player-container" class="w-full max-w-5xl h-full flex items-center"></div>
 
         <div id="tapLeft" class="dt-zone dt-left">
-            <div class="tap-icon"><i class="fas fa-backward text-2xl"></i><span class="text-xs font-bold mt-1">10s</span></div>
+            <div class="tap-icon"><i class="fas fa-backward text-3xl"></i><span class="text-sm font-bold mt-2">10s</span></div>
         </div>
         <div id="tapRight" class="dt-zone dt-right">
-            <div class="tap-icon"><i class="fas fa-forward text-2xl"></i><span class="text-xs font-bold mt-1">10s</span></div>
+            <div class="tap-icon"><i class="fas fa-forward text-3xl"></i><span class="text-sm font-bold mt-2">10s</span></div>
         </div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // 1. التحقق من الأمان وجلب كود الطالب
-        const userCode = checkAuth(); // من ملف auth.js
+        const userCode = checkAuth();
         if (!userCode) window.location.href = 'index.html';
-        
-        // عرض كود الطالب كعلامة مائية
         document.getElementById('watermark').innerText = userCode;
 
-        // 2. جلب بيانات الفيديو
         const videoData = JSON.parse(localStorage.getItem('activeLecture'));
         const container = document.getElementById('player-container');
 
         if (!videoData) {
-            alert("خطأ في تحميل الفيديو، العودة للقائمة...");
-            history.back();
+            alert("خطأ في الفيديو"); history.back();
         } else {
-            // تحديد الرابط
-            let src = videoData.stream_url || videoData.video_url || videoData.link || videoData.url;
-            
-            // تنظيف الرابط إذا كان به مسافات
-            if(src) src = src.trim();
-
-            if (!src) {
-                alert("رابط الفيديو غير صالح");
-                history.back();
-            }
-
-            // التحقق هل هو يوتيوب أم رابط مباشر
-            const isYoutube = src.includes('youtube') || src.includes('youtu.be');
-            
-            if (isYoutube) {
-                // استخراج ID اليوتيوب بدقة
-                let videoId = '';
-                if (src.includes('v=')) {
-                    videoId = src.split('v=')[1].split('&')[0];
-                } else if (src.includes('youtu.be/')) {
-                    videoId = src.split('youtu.be/')[1].split('?')[0];
-                }
-                
+            let src = videoData.stream_url || videoData.video_url || "";
+            if(src.includes('youtube') || src.includes('youtu.be')) {
+                let videoId = src.split('v=')[1]?.split('&')[0] || src.split('youtu.be/')[1]?.split('?')[0];
                 container.innerHTML = `<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="${videoId}"></div>`;
             } else {
-                // فيديو مباشر (MP4)
                 container.innerHTML = `<video id="player" playsinline controls><source src="${src}" type="video/mp4" /></video>`;
             }
 
-            // 3. تشغيل Plyr
             const player = new Plyr('#player', {
-                controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'pip', 'fullscreen'],
+                controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
                 settings: ['quality', 'speed'],
                 speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
-                keyboard: { focused: true, global: true },
-                tooltips: { controls: true, seek: true },
-                i18n: { speed: 'السرعة', quality: 'الجودة', settings: 'الإعدادات' }
+                clickToPlay: true, // السماح بالتشغيل بالضغط مرة واحدة
+                fullscreen: { enabled: true, fallback: true, iosNative: false }
             });
 
-            // 4. منطق اللمس المزدوج (Double Tap)
+            // ✅ 1. كود سحري لمنع التكبير عند الضغط مرتين على الشاشة
+            // نقوم باعتراض حدث الـ dblclick ونوقفه تماماً قبل ما يوصل للفيديو
+            document.querySelector('.video-wrapper').addEventListener('dblclick', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+            }, true); // true مهمة جداً عشان نمسك الحدث في الأول
+
+            // ✅ 2. كود اللمس المزدوج للتقديم والتأخير
             const tapLeft = document.getElementById('tapLeft');
             const tapRight = document.getElementById('tapRight');
             let lastTapTime = 0;
 
-            function handleDoubleTap(action) {
+            function handleDoubleTap(e, action) {
+                // منع الحدث من الوصول لـ Plyr عشان ميعملش Play/Pause
+                e.stopPropagation();
+                e.preventDefault();
+
                 const currentTime = new Date().getTime();
                 const tapLength = currentTime - lastTapTime;
-                
+
                 if (tapLength < 300 && tapLength > 0) {
-                    // Double Tap Detected
+                    // Double Tap Detect
                     if (action === 'forward') {
                         player.forward(10);
                         animateTap(tapRight);
@@ -170,27 +142,22 @@
                         player.rewind(10);
                         animateTap(tapLeft);
                     }
+                } else {
+                    // Single Tap (ممكن نشغل/نوقف الفيديو لو حابب، أو نسيبه)
+                    // حالياً هنسيبه عشان ميتعارضش مع الـ Double
+                    player.togglePlay(); 
                 }
                 lastTapTime = currentTime;
             }
 
             function animateTap(element) {
                 element.style.opacity = '1';
-                setTimeout(() => { element.style.opacity = '0'; }, 500);
+                setTimeout(() => { element.style.opacity = '0'; }, 400);
             }
 
-            tapRight.addEventListener('click', () => handleDoubleTap('forward'));
-            tapLeft.addEventListener('click', () => handleDoubleTap('backward'));
-
-            // 5. حماية إضافية (منع سكرين شوت - محاولة فقط)
-            document.addEventListener('keyup', (e) => {
-                if (e.key == 'PrintScreen') {
-                    navigator.clipboard.writeText('');
-                    alert('⚠️ لقطات الشاشة ممنوعة للحفاظ على حقوق الملكية');
-                    container.style.display = 'none';
-                    setTimeout(() => container.style.display = 'block', 1000);
-                }
-            });
+            // استخدام 'click' بدل 'touchstart' عشان التوافق
+            tapRight.addEventListener('click', (e) => handleDoubleTap(e, 'forward'));
+            tapLeft.addEventListener('click', (e) => handleDoubleTap(e, 'backward'));
         }
     </script>
 </body>
