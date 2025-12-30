@@ -5,371 +5,284 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>المواد الدراسية | FULL MARK</title>
     
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="auth.js"></script>
     
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
 
     <style>
-        /* 🎨 ثيم منصة FULL MARK */
-        :root {
-            --bg-dark: #00040f;
-            --card-bg: rgba(30, 41, 59, 0.4);
-            --gold: #fbbf24;
-            --blue-glow: #3b82f6;
-        }
-
+        /* إعدادات الخلفية والألوان بناءً على الصور */
         body { 
-            background-color: var(--bg-dark); 
+            background: #050a18; /* كحلي غامق جداً */
             color: white; 
-            font-family: 'Tajawal', sans-serif; 
+            font-family: 'Cairo', sans-serif; 
             min-height: 100vh; 
-            overflow-x: hidden;
-            padding-bottom: 50px;
+            padding-bottom: 80px; 
+            overflow-x: hidden; 
         }
 
-        /* 🌌 خلفية النجوم والتوهج */
-        .bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2;
-            background: radial-gradient(circle at 50% 0%, rgba(29, 78, 216, 0.25), rgba(88, 28, 135, 0.15), #00040f 80%);
+        /* تأثير الإضاءة الخلفية */
+        .bg-glow { 
+            position: fixed; top: -20%; left: 50%; transform: translateX(-50%); 
+            width: 150%; height: 600px; 
+            background: radial-gradient(circle, rgba(60, 40, 160, 0.25) 0%, transparent 70%); 
+            z-index: -1; pointer-events: none;
         }
-        .stars-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
-        }
-        .star {
-            position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
-            box-shadow: 0 0 5px rgba(255,255,255,0.8);
-            animation: twinkle var(--duration) infinite ease-in-out; opacity: 0;
-        }
-        @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* 👤 الهيدر العلوي */
-        .glass-header {
-            background: rgba(2, 6, 23, 0.85);
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(255, 215, 0, 0.1);
+        /* الهيدر الجديد */
+        .header-container {
             display: flex; justify-content: space-between; align-items: center;
-            backdrop-filter: blur(20px);
-            position: sticky; top: 0; z-index: 100;
+            padding: 20px 25px;
+            margin-bottom: 10px;
         }
 
-        /* 💪 شريط التحفيز */
-        .motivation-bar {
-            background: linear-gradient(90deg, rgba(30, 58, 138, 0.4), rgba(88, 28, 135, 0.4));
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 12px; text-align: center;
-            font-size: 0.9rem; color: var(--gold); font-weight: bold;
-            display: flex; justify-content: center; align-items: center; gap: 8px;
-            text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+        /* أزرار الهيدر (الطاقة والتاج) */
+        .icon-btn {
+            width: 50px; height: 50px;
+            border-radius: 18px;
+            background: #111526;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: #5b6a8e;
+            transition: 0.3s; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .icon-btn.power:hover { color: #ef4444; background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+        .icon-btn.crown:hover { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border-color: #fbbf24; }
+
+        /* منطقة البروفايل */
+        .profile-area {
+            display: flex; align-items: center; gap: 12px;
+            background: #111526; padding: 6px 15px 6px 6px;
+            border-radius: 50px; border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .p-img-box {
+            width: 45px; height: 45px; border-radius: 50%;
+            border: 2px solid #6366f1; padding: 2px; position: relative;
+        }
+        .p-img { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #0f172a; }
+        .p-status {
+            position: absolute; bottom: 0; right: 0; width: 12px; height: 12px;
+            background: #22c55e; border: 2px solid #111526; border-radius: 50%;
         }
 
-        /* 🏷️ عنوان المنصة */
-        .branding-title {
-            text-align: center; margin: 30px 0 20px;
+        /* العناوين */
+        .main-title {
+            text-align: center; margin-bottom: 40px;
         }
-        .branding-text {
-            font-family: 'Cairo', sans-serif;
-            font-size: 2.5rem; font-weight: 900;
-            background: linear-gradient(to right, #fff, var(--gold), #fff);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            text-shadow: 0 4px 15px rgba(251, 191, 36, 0.2);
-            letter-spacing: 2px;
+        .title-text {
+            font-size: 2.2rem; font-weight: 900; color: #a5b4fc;
+            text-shadow: 0 0 20px rgba(99, 102, 241, 0.3); letter-spacing: 1px;
         }
-
-        /* 📚 شبكة المواد */
-        #subjects-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px;
-            padding: 0 20px;
-            max-width: 800px;
-            margin: 0 auto;
-            list-style: none;
+        .subtitle-text {
+            color: #64748b; font-size: 0.9rem; font-weight: 700;
+            margin-top: -5px; position: relative; display: inline-block;
+        }
+        .subtitle-text::after {
+            content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 3px; background: #6366f1; border-radius: 2px;
         }
 
-        @media (min-width: 768px) {
-            #subjects-list { grid-template-columns: repeat(4, 1fr); }
-        }
-
-        /* 🃏 كارت المادة */
+        /* كروت المواد (التصميم الجديد) */
         .subject-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            overflow: hidden;
-            position: relative;
-            height: 180px;
-            display: flex; flex-direction: column;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            box-shadow: 0 10px 20px -10px rgba(0,0,0,0.5);
+            background: #10152a; /* لون الكارت الغامق */
+            border-radius: 35px;
+            padding: 25px;
+            text-align: center;
+            height: 280px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            border: 1px solid transparent;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer; position: relative; overflow: hidden;
         }
-
+        
         .subject-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--gold);
-            box-shadow: 0 15px 30px -10px rgba(251, 191, 36, 0.2);
+            transform: translateY(-10px);
+            border-color: #3b4566;
+            background: #151b33;
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5);
         }
 
         /* صورة المادة */
-        .img-area {
-            height: 110px; width: 100%; overflow: hidden; position: relative;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+        .s-img-container {
+            width: 130px; height: 130px; margin-bottom: 20px;
+            transition: 0.4s;
         }
-        .real-img {
-            width: 100%; height: 100%; object-fit: cover;
-            filter: brightness(0.8); transition: 0.5s;
-        }
-        .subject-card:hover .real-img { transform: scale(1.1); filter: brightness(1.1); }
+        .subject-card:hover .s-img-container { transform: scale(1.1) rotate(5deg); }
+        .s-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4)); }
 
-        /* منطقة النص */
-        .text-area {
-            flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: linear-gradient(to top, #0a0f1f, #0f172a); z-index: 2;
-        }
-        .sub-name { font-size: 1.1rem; font-weight: 800; color: white; margin-bottom: 2px; }
-        .sub-hint { font-size: 0.7rem; color: #94a3b8; }
-        .subject-card:hover .sub-hint { color: var(--gold); }
+        /* اسم المادة */
+        .s-name { font-size: 1.6rem; font-weight: 800; color: white; margin-bottom: 15px; }
 
-        /* رسائل التحميل والخطأ */
-        .loading { grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 50px; }
-        .error-msg { 
-            grid-column: 1 / -1; 
-            text-align: center; 
-            color: #ef4444; 
-            background: rgba(239, 68, 68, 0.1); 
-            padding: 20px; 
-            border-radius: 15px;
-            border: 1px solid rgba(239, 68, 68, 0.3);
+        /* شارة المعلمين */
+        .teacher-badge {
+            background: #1e2540; color: #94a3b8;
+            padding: 8px 18px; border-radius: 15px;
+            font-size: 0.85rem; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+            transition: 0.3s;
+        }
+        .subject-card:hover .teacher-badge { background: #6366f1; color: white; }
+
+        /* التحميل */
+        .skeleton { background: #111526; border-radius: 35px; animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+        
+        /* الحقوق */
+        .footer-brand {
+            position: fixed; bottom: 20px; left: 0; w-full; text-align: center; width: 100%;
+            font-size: 0.7rem; font-weight: 900; letter-spacing: 3px; color: #334155;
+            text-transform: uppercase; pointer-events: none;
         }
     </style>
 </head>
 <body>
 
     <div class="bg-glow"></div>
-    <div class="stars-container">
-        <div class="star" style="top:10%; left:20%; --duration:3s"></div>
-        <div class="star" style="top:50%; left:50%; --duration:5s"></div>
-        <div class="star" style="top:80%; left:70%; --duration:3s"></div>
-    </div>
 
-    <header class="glass-header">
-        <div onclick="window.location.href='profile.html'" class="flex items-center gap-3 cursor-pointer group">
-            <div class="relative">
-                <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" 
-                     class="w-11 h-11 rounded-full border-2 border-indigo-500 bg-slate-800 p-0.5 group-hover:border-yellow-400 transition">
-                <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
-            </div>
-            <div>
-                <h2 id="studentNameDisplay" class="font-bold text-sm text-white group-hover:text-yellow-400 transition">...</h2>
-                <p class="text-[10px] text-gray-400">الملف الشخصي</p>
-            </div>
-        </div>
+    <div id="app">
         
-        <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center border border-red-500/20 hover:bg-red-500 hover:text-white transition">
-            <i class="fas fa-power-off text-sm"></i>
-        </button>
-    </header>
+        <header class="header-container">
+            <div class="flex gap-3">
+                <div @click="logout" class="icon-btn power"><i class="fas fa-power-off"></i></div>
+                <a href="profile.html" class="icon-btn crown"><i class="fas fa-crown"></i></a>
+            </div>
 
-    <div class="motivation-bar">
-        <i class="fas fa-bolt animate-pulse text-yellow-400"></i>
-        <span id="quoteText">...</span>
+            <div class="profile-area">
+                <div class="text-right">
+                    <h2 class="text-white font-bold text-sm leading-tight" id="sName">...</h2>
+                    <p class="text-[10px] text-indigo-400 font-bold">بطل الثانوية 🎓</p>
+                </div>
+                <div class="p-img-box">
+                    <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" class="p-img">
+                    <div class="p-status"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-title">
+            <h1 class="title-text">نظام FULL MARK</h1>
+            <p class="subtitle-text">مسارك للتفوق</p>
+        </div>
+
+        <div class="px-6 pb-20 max-w-7xl mx-auto">
+            
+            <div v-if="loading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="i in 3" class="skeleton h-[280px]"></div>
+            </div>
+
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="s in subjects" :key="s.id" @click="go(s)" class="subject-card group">
+                    
+                    <div class="s-img-container">
+                        <img :src="getImg(s.name)" class="s-img">
+                    </div>
+
+                    <h3 class="s-name">{{ s.name }}</h3>
+
+                    <div class="teacher-badge">
+                        <i class="fas fa-chalkboard-user"></i>
+                        <span>{{ s.teachers ? s.teachers.length : 0 }} معلمين</span>
+                    </div>
+
+                </div>
+            </div>
+
+            <div v-if="!loading && subjects.length === 0" class="text-center py-20 opacity-50">
+                <i class="fas fa-box-open text-4xl mb-2"></i>
+                <p>لا توجد مواد متاحة حالياً</p>
+            </div>
+
+        </div>
+
+        <div class="footer-brand">ELGIZAWY • DEVELOPMENT</div>
     </div>
-
-    <div class="branding-title">
-        <h1 class="branding-text">FULL MARK</h1>
-        <p class="text-gray-400 text-xs mt-1 tracking-widest uppercase">مسارك نحو التفوق</p>
-    </div>
-
-    <ul id="subjects-list">
-        <li class="loading">
-            <i class="fas fa-rocket fa-bounce mb-3 text-2xl text-indigo-500"></i><br>
-            جاري تجهيز المواد يا بطل...
-        </li>
-    </ul>
 
     <script>
-        // 1. Firebase Config
-        const firebaseConfig = {
-            apiKey: "AIzaSyD1QB3qaFfkGYq0OWOEAr83V25NAPFwxzs",
-            authDomain: "fullmark-2025.firebaseapp.com",
-            databaseURL: "https://fullmark-2025-default-rtdb.firebaseio.com",
-            projectId: "fullmark-2025",
-            storageBucket: "fullmark-2025.firebasestorage.app",
-            messagingSenderId: "963956202032",
-            appId: "1:963956202032:web:4df914457d79b75dee2bf5"
-        };
-        
-        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const db = firebase.database();
-
-        // 2. Quotes
-        const quotes = [
-            "🚀 ابدأ الآن ولا تؤجل!", "💪 التعب يزول والإنجاز يبقى", "🏆 أنت بطل قصتك", 
-            "🔥 كل دقيقة تفرق في مستقبلك", "💎 حلمك يستاهل", "🌟 ركز على هدفك", 
-            "🦁 كن قوياً لأجل نفسك", "⚡ النجاح قرار مش صدفة", "🎓 تخيل لحظة التخرج"
-        ];
-        let qIndex = 0;
-        const qEl = document.getElementById('quoteText');
-        if(qEl) {
-            qEl.innerText = quotes[0];
-            setInterval(() => {
-                qIndex = (qIndex + 1) % quotes.length;
-                qEl.innerText = quotes[qIndex];
-            }, 5000);
-        }
-
-        // 3. Images & URLs
-        const subjectImages = {
-            "أحياء": "https://i.ibb.co/3WqqJk8/bio.jpg",
-            "فيزياء": "https://i.ibb.co/y4qQJk8/physics.jpg",
-            "كيمياء": "https://i.ibb.co/xXj11k8/chem.jpg",
-            "لغة عربية": "https://i.ibb.co/9hQ6z5y/arabic.jpg",
-            "English": "https://i.ibb.co/6rQ6z5y/english.jpg",
-            "جيولوجيا": "https://images.unsplash.com/photo-1599309328828-92285127096b?w=400&q=80",
-            "الرياضيات": "https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&q=80",
-            "تاريخ": "https://images.unsplash.com/photo-1568684333877-4d39f2c871c9?w=400&q=80",
-            "جغرافيا": "https://images.unsplash.com/photo-1524661135-423995f22d0b?w=400&q=80",
-            "الإحصاء": "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400&q=80",
-            "Le français": "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80"
-        };
-        
-        const JSON_URLS = {
-            'علمي علوم': "https://plus-teal.vercel.app/organized_output.json",
-            'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
-            'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json", 
-            'أزهر': "https://plus-teal.vercel.app/organized_output.json",
-            'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
+        // قاعدة بيانات الصور (نفس الصور 3D اللي في التصميم)
+        const IMAGES_DB = {
+            "فيزياء": "https://cdn3d.iconscout.com/3d/premium/thumb/physics-7265691-5840333.png",
+            "كيمياء": "https://cdn3d.iconscout.com/3d/premium/thumb/chemistry-atoms-5691557-4740112.png",
+            "أحياء": "https://cdn3d.iconscout.com/3d/premium/thumb/dna-5256241-4385108.png",
+            "لغة عربية": "https://cdn3d.iconscout.com/3d/premium/thumb/ramadan-quran-5136006-4286786.png",
+            "English": "https://cdn3d.iconscout.com/3d/premium/thumb/english-book-10041135-8135359.png",
+            "رياضيات": "https://cdn3d.iconscout.com/3d/premium/thumb/mathematics-9173295-7489437.png",
+            "تاريخ": "https://cdn3d.iconscout.com/3d/premium/thumb/pharaoh-6450376-5310636.png",
+            "جغرافيا": "https://cdn3d.iconscout.com/3d/premium/thumb/earth-5134701-4282715.png",
+            "فرنساوي": "https://cdn3d.iconscout.com/3d/premium/thumb/eiffel-tower-4034026-3337299.png",
+            "جيولوجيا": "https://cdn3d.iconscout.com/3d/premium/thumb/mountain-4940523-4116498.png",
+            "default": "https://cdn3d.iconscout.com/3d/premium/thumb/education-4940505-4116480.png"
         };
 
-        // 4. Main Logic
-        const activeCode = localStorage.getItem('alpha_user_code') || localStorage.getItem('activeCode');
-        
-        if (!activeCode) {
-            window.location.href = 'index.html'; 
-        } else {
-            // Get Student Name (معالجة سريعة لاسم الطالب)
-            db.ref(`approvedStudents/${activeCode}`).once('value').then(snapshot => {
-                const data = snapshot.val();
-                if (data && data.studentName) {
-                    document.getElementById('studentNameDisplay').innerText = data.studentName;
-                } else {
-                    document.getElementById('studentNameDisplay').innerText = "طالب مميز";
-                }
-            }).catch(() => {
-                document.getElementById('studentNameDisplay').innerText = "طالب مميز";
-            });
-        }
+        const { createApp, ref, onMounted } = Vue;
 
-        // 🚀 الدالة الذكية لجلب الرابط (مع نظام الطوارئ Timeout)
-        async function getDataSourceURL() {
-            // لو مفيش كود، رجع الافتراضي فوراً
-            if (!activeCode) return JSON_URLS['الافتراضي'];
+        createApp({
+            setup() {
+                const subjects = ref([]);
+                const loading = ref(true);
+                const yid = ref(null);
 
-            // إنشاء وعد (Promise) ينتهي بعد 3 ثواني لو قاعدة البيانات مردتش
-            const timeout = new Promise((resolve) => {
-                setTimeout(() => resolve("TIMEOUT"), 3000);
-            });
+                const getImg = (n) => {
+                    for(let key in IMAGES_DB) if(n.toLowerCase().includes(key.toLowerCase())) return IMAGES_DB[key];
+                    return IMAGES_DB['default'];
+                };
 
-            // جلب بيانات الطالب من فايربيس
-            const fetchStudentData = db.ref(`approvedStudents/${activeCode}`).once('value').then(snap => snap.val());
+                const logout = () => { 
+                    if(confirm("هل تريد تسجيل الخروج؟")) {
+                        localStorage.removeItem('alpha_user_code'); 
+                        window.location.href = 'index.html'; 
+                    }
+                };
 
-            try {
-                // سباق بين فايربيس والعداد (أيهما يسبق)
-                const result = await Promise.race([fetchStudentData, timeout]);
+                const go = (s) => {
+                    // الانتقال لصفحة المدرسين مع تمرير البيانات
+                    window.location.href = `teachers.html?yid=${yid.value}&sid=${s.id}`;
+                };
 
-                if (result === "TIMEOUT") {
-                    console.warn("تأخر الاتصال بقاعدة البيانات، جاري استخدام الرابط الافتراضي");
-                    return JSON_URLS['الافتراضي']; // تشغيل الطوارئ
-                }
+                onMounted(async () => {
+                    // التحقق من الأمان (من ملف auth.js)
+                    const code = checkAuth();
+                    if(!code) return;
 
-                if (result && result.section) {
-                    const sec = result.section.trim();
-                    return JSON_URLS[sec] || JSON_URLS['الافتراضي'];
-                }
+                    const db = firebase.database();
+                    try {
+                        // 1. جلب بيانات الطالب
+                        const userSnap = await db.ref('approvedStudents/'+code).once('value');
+                        const user = userSnap.val();
+                        if(user) document.getElementById('sName').innerText = user.studentName;
 
-                return JSON_URLS['الافتراضي'];
+                        // 2. جلب المواد بناءً على الشعبة
+                        const URLS = { 
+                            'علمي علوم': "https://plus-teal.vercel.app/organized_output.json", 
+                            'أدبي': "https://plus-teal.vercel.app/organized_output-a.json", 
+                            'علمي رياضة': "https://platform-sigma-seven.vercel.app/organized_output-e.json",
+                            'أزهر': "https://plus-teal.vercel.app/organized_output.json"
+                        };
 
-            } catch (error) {
-                console.error("خطأ في الاتصال:", error);
-                return JSON_URLS['الافتراضي']; // تشغيل الطوارئ في حالة الخطأ
-            }
-        }
+                        const targetURL = URLS[user.section] || URLS['علمي علوم'];
+                        const res = await fetch(targetURL);
+                        const data = await res.json();
+                        
+                        // الوصول للصف الثالث الثانوي (ID: 3)
+                        let year = data.find(y => y.id == 3) || data[0];
+                        yid.value = year.id;
+                        subjects.value = year.subjects || [];
 
-        async function loadSubjects() {
-            const subjectsList = document.getElementById('subjects-list');
-            
-            try {
-                // 1. تحديد الرابط (بذكاء)
-                const finalSourceURL = await getDataSourceURL();
-                console.log("Loading from:", finalSourceURL);
-
-                // 2. جلب ملف المواد
-                const res = await fetch(finalSourceURL);
-                if (!res.ok) throw new Error("فشل في تحميل ملف المواد");
-                const data = await res.json();
-
-                // 3. البحث عن الصف الثالث
-                const year = data.find(y => y.id == 3 || y.name == "3");
-
-                if (!year) {
-                    subjectsList.innerHTML = `<li class="error-msg">⚠️ لم يتم العثور على مواد الصف الثالث</li>`;
-                    return;
-                }
-
-                subjectsList.innerHTML = ""; // مسح التحميل
-
-                // 4. عرض المواد
-                if (!year.subjects || year.subjects.length === 0) {
-                     subjectsList.innerHTML = `<li class="error-msg">⚠️ القائمة فارغة حالياً</li>`;
-                     return;
-                }
-
-                year.subjects.forEach(subject => {
-                    const li = document.createElement("li");
-                    li.className = "subject-card group";
-                    const imgSrc = subjectImages[subject.name] || "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80";
-                    
-                    li.innerHTML = `
-                        <div class="img-area">
-                            <img src="${imgSrc}" class="real-img" loading="lazy">
-                        </div>
-                        <div class="text-area">
-                            <h3 class="sub-name">${subject.name}</h3>
-                            <p class="sub-hint">اضغط للدخول</p>
-                        </div>
-                    `;
-
-                    li.onclick = () => {
-                        window.location.href = `teachers.html?yid=${year.id}&sid=${subject.id}`;
-                    };
-                    subjectsList.appendChild(li);
+                    } catch (e) { 
+                        console.error("Error fetching data:", e);
+                        alert("حدث خطأ في تحميل المواد، تأكد من الاتصال بالإنترنت");
+                    } finally { 
+                        loading.value = false; 
+                    }
                 });
 
-            } catch (err) {
-                console.error(err);
-                subjectsList.innerHTML = `
-                    <li class="error-msg">
-                        <i class="fas fa-wifi text-2xl mb-2"></i><br>
-                        تأكد من اتصال الإنترنت<br>
-                        <button onclick="location.reload()" style="margin-top:10px; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:10px;">إعادة المحاولة</button>
-                    </li>
-                `;
+                return { subjects, loading, getImg, logout, go };
             }
-        }
-
-        function logout() {
-            if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
-                localStorage.removeItem('alpha_user_code');
-                localStorage.removeItem('activeCode');
-                window.location.replace('index.html');
-            }
-        }
-
-        loadSubjects();
+        }).mount('#app');
     </script>
 </body>
 </html>
