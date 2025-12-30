@@ -134,7 +134,7 @@
         .sub-hint { font-size: 0.7rem; color: #94a3b8; }
         .subject-card:hover .sub-hint { color: var(--gold); }
 
-        /* رسالة التحميل والخطأ */
+        /* رسائل التحميل والخطأ */
         .loading { grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 50px; }
         .error-msg { 
             grid-column: 1 / -1; 
@@ -251,32 +251,51 @@
         if (!activeCode) {
             window.location.href = 'index.html'; 
         } else {
-            // Get Student Name
+            // Get Student Name (معالجة سريعة لاسم الطالب)
             db.ref(`approvedStudents/${activeCode}`).once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (data && data.studentName) {
                     document.getElementById('studentNameDisplay').innerText = data.studentName;
                 } else {
-                    document.getElementById('studentNameDisplay').innerText = "طالب";
+                    document.getElementById('studentNameDisplay').innerText = "طالب مميز";
                 }
             }).catch(() => {
-                document.getElementById('studentNameDisplay').innerText = "طالب";
+                document.getElementById('studentNameDisplay').innerText = "طالب مميز";
             });
         }
 
+        // 🚀 الدالة الذكية لجلب الرابط (مع نظام الطوارئ Timeout)
         async function getDataSourceURL() {
+            // لو مفيش كود، رجع الافتراضي فوراً
             if (!activeCode) return JSON_URLS['الافتراضي'];
+
+            // إنشاء وعد (Promise) ينتهي بعد 3 ثواني لو قاعدة البيانات مردتش
+            const timeout = new Promise((resolve) => {
+                setTimeout(() => resolve("TIMEOUT"), 3000);
+            });
+
+            // جلب بيانات الطالب من فايربيس
+            const fetchStudentData = db.ref(`approvedStudents/${activeCode}`).once('value').then(snap => snap.val());
+
             try {
-                const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
-                const studentData = snapshot.val();
-                if (studentData && studentData.section) {
-                    const sec = studentData.section.trim();
+                // سباق بين فايربيس والعداد (أيهما يسبق)
+                const result = await Promise.race([fetchStudentData, timeout]);
+
+                if (result === "TIMEOUT") {
+                    console.warn("تأخر الاتصال بقاعدة البيانات، جاري استخدام الرابط الافتراضي");
+                    return JSON_URLS['الافتراضي']; // تشغيل الطوارئ
+                }
+
+                if (result && result.section) {
+                    const sec = result.section.trim();
                     return JSON_URLS[sec] || JSON_URLS['الافتراضي'];
                 }
+
                 return JSON_URLS['الافتراضي'];
+
             } catch (error) {
-                console.error("Firebase fetch error:", error);
-                return JSON_URLS['الافتراضي']; // Fallback
+                console.error("خطأ في الاتصال:", error);
+                return JSON_URLS['الافتراضي']; // تشغيل الطوارئ في حالة الخطأ
             }
         }
 
@@ -284,26 +303,26 @@
             const subjectsList = document.getElementById('subjects-list');
             
             try {
-                // 1. Get URL
+                // 1. تحديد الرابط (بذكاء)
                 const finalSourceURL = await getDataSourceURL();
-                console.log("Fetching from:", finalSourceURL);
+                console.log("Loading from:", finalSourceURL);
 
-                // 2. Fetch JSON
+                // 2. جلب ملف المواد
                 const res = await fetch(finalSourceURL);
-                if (!res.ok) throw new Error("فشل الاتصال بسيرفر المواد (404)");
+                if (!res.ok) throw new Error("فشل في تحميل ملف المواد");
                 const data = await res.json();
 
-                // 3. Find Year 3 (loose equality for string/number id)
+                // 3. البحث عن الصف الثالث
                 const year = data.find(y => y.id == 3 || y.name == "3");
 
                 if (!year) {
-                    subjectsList.innerHTML = `<li class="error-msg">⚠️ لم يتم العثور على مواد الصف الثالث في قاعدة البيانات</li>`;
+                    subjectsList.innerHTML = `<li class="error-msg">⚠️ لم يتم العثور على مواد الصف الثالث</li>`;
                     return;
                 }
 
-                subjectsList.innerHTML = ""; // Clear loading
+                subjectsList.innerHTML = ""; // مسح التحميل
 
-                // 4. Render
+                // 4. عرض المواد
                 if (!year.subjects || year.subjects.length === 0) {
                      subjectsList.innerHTML = `<li class="error-msg">⚠️ القائمة فارغة حالياً</li>`;
                      return;
@@ -335,8 +354,7 @@
                 subjectsList.innerHTML = `
                     <li class="error-msg">
                         <i class="fas fa-wifi text-2xl mb-2"></i><br>
-                        حدث خطأ أثناء تحميل المواد.<br>
-                        <span style="font-size:0.8rem; opacity:0.8">${err.message}</span><br>
+                        تأكد من اتصال الإنترنت<br>
                         <button onclick="location.reload()" style="margin-top:10px; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:10px;">إعادة المحاولة</button>
                     </li>
                 `;
@@ -354,5 +372,4 @@
         loadSubjects();
     </script>
 </body>
-    </html>
-    
+</html>
