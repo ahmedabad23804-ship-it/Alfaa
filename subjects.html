@@ -46,7 +46,7 @@
         }
         @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* 👤 الهيدر العلوي (معلومات الطالب) */
+        /* 👤 الهيدر العلوي */
         .glass-header {
             background: rgba(2, 6, 23, 0.85);
             padding: 15px 20px;
@@ -79,10 +79,10 @@
             letter-spacing: 2px;
         }
 
-        /* 📚 شبكة المواد (Grid) */
+        /* 📚 شبكة المواد */
         #subjects-list {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* عمودين للموبايل */
+            grid-template-columns: repeat(2, 1fr); 
             gap: 15px;
             padding: 0 20px;
             max-width: 800px;
@@ -134,8 +134,17 @@
         .sub-hint { font-size: 0.7rem; color: #94a3b8; }
         .subject-card:hover .sub-hint { color: var(--gold); }
 
-        /* رسالة التحميل */
+        /* رسالة التحميل والخطأ */
         .loading { grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 1rem; margin-top: 50px; }
+        .error-msg { 
+            grid-column: 1 / -1; 
+            text-align: center; 
+            color: #ef4444; 
+            background: rgba(239, 68, 68, 0.1); 
+            padding: 20px; 
+            border-radius: 15px;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -155,7 +164,7 @@
                 <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-black rounded-full"></div>
             </div>
             <div>
-                <h2 id="studentNameDisplay" class="font-bold text-sm text-white group-hover:text-yellow-400 transition">جاري التحميل...</h2>
+                <h2 id="studentNameDisplay" class="font-bold text-sm text-white group-hover:text-yellow-400 transition">...</h2>
                 <p class="text-[10px] text-gray-400">الملف الشخصي</p>
             </div>
         </div>
@@ -176,13 +185,14 @@
     </div>
 
     <ul id="subjects-list">
-        <li class="loading"><i class="fas fa-circle-notch fa-spin"></i> جاري تجهيز المواد...</li>
+        <li class="loading">
+            <i class="fas fa-rocket fa-bounce mb-3 text-2xl text-indigo-500"></i><br>
+            جاري تجهيز المواد يا بطل...
+        </li>
     </ul>
 
     <script>
-        // ----------------------------------------------------
-        // 1. إعدادات Firebase (Full Mark)
-        // ----------------------------------------------------
+        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD1QB3qaFfkGYq0OWOEAr83V25NAPFwxzs",
             authDomain: "fullmark-2025.firebaseapp.com",
@@ -196,24 +206,12 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // ----------------------------------------------------
-        // 2. الجمل التحفيزية
-        // ----------------------------------------------------
+        // 2. Quotes
         const quotes = [
-            "🚀 ابدأ الآن ولا تؤجل!", "💪 التعب يزول والإنجاز يبقى", "🏆 أنت بطل قصتك", "🔥 كل دقيقة تفرق في مستقبلك",
-            "📚 الكتاب صديقك الوفي", "💎 حلمك يستاهل", "🌟 ركز على هدفك", "🦁 كن قوياً لأجل نفسك",
-            "⚡ النجاح قرار مش صدفة", "🎓 تخيل لحظة التخرج", "⏳ الوقت كالسيف", "🌈 بعد الصبر جبر",
-            "🎯 خليك قناص فرص", "🧠 عقلك مصنع المعجزات", "🛤️ الطريق طويل بس النهاية تستاهل", "🥇 المركز الأول مش محجوز لحد",
-            "🦅 حلق بطموحك", "🛡️ علمك هو سلاحك", "🔮 بكرة أحلى بمجهودك", "📍 حدد وجهتك",
-            "🗝️ المفتاح في ايدك", "🔋 اشحن طاقتك", "⛰️ القمة تسع الجميع", "🌊 كن كالبحر في عطائك",
-            "🏗️ ابنِ مستقبلك", "🌌 أحلامك حدودها السما", "🏇 السباق لسه مخلصش", "🧩 كمل الصورة الناقصة",
-            "🎨 ارسم حياتك", "⛵ قود سفينتك لبر الأمان", "⚓ خليك ثابت", "🛸 انطلق للمستقبل",
-            "🏹 صيب هدفك", "🎪 الحياة فرص", "🎻 اعزف لحن نجاحك", "📢 صوت نجاحك عالي",
-            "🎁 كافئ نفسك", "👑 أنت الملك في مجالك", "🕯️ كن شمعة تنير دروب الآخرين", "🔦 دور على النور جواك",
-            "🔌 اوصل لمصدر طاقتك", "📡 استقبل اشارات النجاح", "💾 احفظ معلوماتك", "🖨️ اطبع اسمك في التاريخ",
-            "📈 سهمك طالع لفوق", "📅 النهاردة يومك", "📌 ثبت هدفك", "📎 رتب أوراقك", "📏 قيس تقدمك", "🎉 احتفل بإنجازاتك"
+            "🚀 ابدأ الآن ولا تؤجل!", "💪 التعب يزول والإنجاز يبقى", "🏆 أنت بطل قصتك", 
+            "🔥 كل دقيقة تفرق في مستقبلك", "💎 حلمك يستاهل", "🌟 ركز على هدفك", 
+            "🦁 كن قوياً لأجل نفسك", "⚡ النجاح قرار مش صدفة", "🎓 تخيل لحظة التخرج"
         ];
-
         let qIndex = 0;
         const qEl = document.getElementById('quoteText');
         if(qEl) {
@@ -224,9 +222,7 @@
             }, 5000);
         }
 
-        // ----------------------------------------------------
-        // 3. روابط البيانات والصور
-        // ----------------------------------------------------
+        // 3. Images & URLs
         const subjectImages = {
             "أحياء": "https://i.ibb.co/3WqqJk8/bio.jpg",
             "فيزياء": "https://i.ibb.co/y4qQJk8/physics.jpg",
@@ -249,24 +245,22 @@
             'الافتراضي': "https://plus-teal.vercel.app/organized_output.json"
         };
 
-        // ----------------------------------------------------
-        // 4. المنطق البرمجي (جلب البيانات)
-        // ----------------------------------------------------
-        
-        // التحقق من الدخول وجلب اسم الطالب
+        // 4. Main Logic
         const activeCode = localStorage.getItem('alpha_user_code') || localStorage.getItem('activeCode');
         
         if (!activeCode) {
-            window.location.href = 'index.html'; // توجيه لصفحة الدخول لو مفيش كود
+            window.location.href = 'index.html'; 
         } else {
-            // جلب اسم الطالب
+            // Get Student Name
             db.ref(`approvedStudents/${activeCode}`).once('value').then(snapshot => {
                 const data = snapshot.val();
                 if (data && data.studentName) {
                     document.getElementById('studentNameDisplay').innerText = data.studentName;
                 } else {
-                    document.getElementById('studentNameDisplay').innerText = "طالب مميز";
+                    document.getElementById('studentNameDisplay').innerText = "طالب";
                 }
+            }).catch(() => {
+                document.getElementById('studentNameDisplay').innerText = "طالب";
             });
         }
 
@@ -276,42 +270,48 @@
                 const snapshot = await db.ref(`approvedStudents/${activeCode}`).once('value');
                 const studentData = snapshot.val();
                 if (studentData && studentData.section) {
-                    return JSON_URLS[studentData.section.trim()] || JSON_URLS['الافتراضي'];
+                    const sec = studentData.section.trim();
+                    return JSON_URLS[sec] || JSON_URLS['الافتراضي'];
                 }
                 return JSON_URLS['الافتراضي'];
             } catch (error) {
-                console.error("Firebase Error:", error);
-                return JSON_URLS['الافتراضي'];
+                console.error("Firebase fetch error:", error);
+                return JSON_URLS['الافتراضي']; // Fallback
             }
         }
 
         async function loadSubjects() {
             const subjectsList = document.getElementById('subjects-list');
+            
             try {
-                // 1. تحديد اللينك
+                // 1. Get URL
                 const finalSourceURL = await getDataSourceURL();
-                
-                // 2. جلب البيانات
+                console.log("Fetching from:", finalSourceURL);
+
+                // 2. Fetch JSON
                 const res = await fetch(finalSourceURL);
-                if (!res.ok) throw new Error("Failed to fetch data");
+                if (!res.ok) throw new Error("فشل الاتصال بسيرفر المواد (404)");
                 const data = await res.json();
 
-                // 3. البحث عن سنة 3
-                const year = data.find(y => y.id === 3 || y.id === "3" || y.name === "3");
+                // 3. Find Year 3 (loose equality for string/number id)
+                const year = data.find(y => y.id == 3 || y.name == "3");
 
                 if (!year) {
-                    subjectsList.innerHTML = `<li class="loading">⚠️ لا توجد مواد متاحة حالياً</li>`;
+                    subjectsList.innerHTML = `<li class="error-msg">⚠️ لم يتم العثور على مواد الصف الثالث في قاعدة البيانات</li>`;
                     return;
                 }
 
-                subjectsList.innerHTML = "";
+                subjectsList.innerHTML = ""; // Clear loading
 
-                // 4. عرض المواد
+                // 4. Render
+                if (!year.subjects || year.subjects.length === 0) {
+                     subjectsList.innerHTML = `<li class="error-msg">⚠️ القائمة فارغة حالياً</li>`;
+                     return;
+                }
+
                 year.subjects.forEach(subject => {
                     const li = document.createElement("li");
                     li.className = "subject-card group";
-                    
-                    // استخدام الصور من القائمة أو صورة افتراضية
                     const imgSrc = subjectImages[subject.name] || "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=400&q=80";
                     
                     li.innerHTML = `
@@ -324,17 +324,22 @@
                         </div>
                     `;
 
-                    // التوجيه
                     li.onclick = () => {
                         window.location.href = `teachers.html?yid=${year.id}&sid=${subject.id}`;
                     };
-
                     subjectsList.appendChild(li);
                 });
 
             } catch (err) {
                 console.error(err);
-                subjectsList.innerHTML = `<li class="loading">❌ فشل تحميل البيانات، تأكد من الإنترنت</li>`;
+                subjectsList.innerHTML = `
+                    <li class="error-msg">
+                        <i class="fas fa-wifi text-2xl mb-2"></i><br>
+                        حدث خطأ أثناء تحميل المواد.<br>
+                        <span style="font-size:0.8rem; opacity:0.8">${err.message}</span><br>
+                        <button onclick="location.reload()" style="margin-top:10px; background:rgba(255,255,255,0.1); padding:5px 15px; border-radius:10px;">إعادة المحاولة</button>
+                    </li>
+                `;
             }
         }
 
@@ -346,9 +351,8 @@
             }
         }
 
-        // تشغيل الدالة
         loadSubjects();
-
     </script>
 </body>
-</html>
+    </html>
+    
