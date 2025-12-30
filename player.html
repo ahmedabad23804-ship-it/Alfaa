@@ -15,138 +15,135 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
+        /* إعدادات الصفحة */
         body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; font-family: 'Tajawal', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
         
-        /* الحاوية الرئيسية */
         .video-wrapper {
             width: 100%; height: 100vh; position: relative; background: #000;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* تعديلات Plyr */
-        .plyr--full-ui input[type=range] { color: #ff0000 !important; }
-        .plyr__control--overlaid { display: none !important; } /* إخفاء زر التشغيل الأصلي */
+        /* ==================== تعديلات Plyr الاحترافية (YouTube Style) ==================== */
         
-        /* شريط التحكم السفلي (التايم لاين وزر التكبير) */
+        /* اللون الرئيسي (أحمر) */
+        :root {
+            --plyr-color-main: #ff0000;
+            --plyr-video-background: #000;
+            --plyr-menu-background: rgba(20, 20, 20, 0.9);
+            --plyr-menu-color: #fff;
+        }
+
+        /* زر التشغيل الكبير في النص */
+        .plyr__control--overlaid {
+            background: rgba(0, 0, 0, 0.6) !important;
+            padding: 20px !important;
+            border-radius: 50% !important;
+        }
+        .plyr__control--overlaid:hover { background: #ff0000 !important; }
+
+        /* شريط التحكم السفلي */
         .plyr__controls {
-            z-index: 1000 !important; /* لازم يكون أعلى حاجة عشان ينداس عليه */
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
-            padding-bottom: 25px !important;
+            background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.9)) !important;
+            padding-bottom: 30px !important;
             padding-top: 50px !important;
+            z-index: 100 !important; /* فوق أي حاجة تانية */
         }
 
-        /* ==================== طبقة الأزرار العائمة (YouTube Style) ==================== */
-        .yt-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 50; /* فوق الفيديو بس تحت شريط التحكم */
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            background: rgba(0, 0, 0, 0.4);
-            transition: opacity 0.3s ease;
-            
-            /* 🔥 السحر هنا: الطبقة دي شفافة للمسات ماعدا الأزرار */
-            /* ده عشان لما تدوس في الفاضي الفيديو يظهر ويختفي، ولما تدوس عالزرار يشتغل */
-            pointer-events: none; 
+        /* تكبير أزرار التحكم للموبايل */
+        .plyr__controls .plyr__control {
+            padding: 10px !important;
         }
 
-        /* السماح بالضغط على الأزرار فقط */
-        .yt-btn-container { pointer-events: auto; display: flex; align-items: center; gap: 40px; margin-bottom: 50px; }
+        /* إجبار زر التكبير على الظهور */
+        .plyr__control--fullscreen { display: inline-block !important; }
 
-        .yt-btn-circle {
-            width: 50px; height: 50px; border-radius: 50%;
-            background: rgba(0, 0, 0, 0.6); color: white;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; border: none;
-            backdrop-filter: blur(4px); transition: 0.2s;
-        }
-        .yt-btn-circle:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
+        /* ==================== عناصر إضافية ==================== */
 
-        .yt-play-big {
-            width: 75px; height: 75px; font-size: 2.2rem;
-            background: rgba(0, 0, 0, 0.7);
-        }
-
-        /* الهيدر العلوي (اسم الفيديو) */
-        .yt-header {
+        /* الهيدر العلوي (اسم الفيديو وزر الرجوع) */
+        .custom-header {
             position: absolute; top: 0; left: 0; width: 100%;
-            padding: 20px; display: flex; justify-content: space-between; align-items: center;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            pointer-events: auto; /* قابل للنقر */
-        }
-
-        /* مناطق الدبل تاب (مفصولة عن زر التكبير) */
-        .dt-zone {
-            position: absolute; top: 20%; bottom: 25%; /* 🔥 سايبين مساحة تحت لزر التكبير */
-            width: 35%; z-index: 60; pointer-events: auto;
-        }
-        .dt-left { left: 0; }
-        .dt-right { right: 0; }
-
-        /* أنميشن الدبل تاب */
-        .ripple-icon {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.8);
-            width: 80px; height: 80px; background: rgba(255,255,255,0.2); border-radius: 50%;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; color: white;
+            padding: 20px; z-index: 50;
+            background: linear-gradient(rgba(0,0,0,0.8), transparent);
+            display: flex; align-items: center; gap: 15px;
+            pointer-events: none; /* عشان اللمس يعدي */
             opacity: 0; transition: 0.3s;
         }
-        .show-ripple { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+        .show-ui .custom-header { opacity: 1; pointer-events: auto; }
 
-        /* كلاس للإخفاء */
-        .hidden-ui { opacity: 0; pointer-events: none !important; }
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1); border-radius: 50%; width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center; cursor: pointer; color: white;
+            backdrop-filter: blur(5px);
+        }
+
+        /* أنميشن التقديم والترجيع (Ripple) */
+        .ripple-icon {
+            position: absolute; top: 50%; transform: translateY(-50%) scale(0.5);
+            width: 80px; height: 80px; background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%; color: white; display: flex; flex-direction: column;
+            align-items: center; justify-content: center; opacity: 0; pointer-events: none; z-index: 60;
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .ripple-left { left: 20%; }
+        .ripple-right { right: 20%; }
         
+        .trigger-anim { opacity: 1; transform: translateY(-50%) scale(1.2); }
+
+        /* مناطق اللمس الخفية (مهمة جداً) */
+        .tap-zone {
+            position: absolute; top: 15%; bottom: 20%; /* سايبين مساحة تحت عشان الزراير */
+            width: 40%; z-index: 40; /* تحت شريط التحكم وفوق الفيديو */
+        }
+        .zone-left { left: 0; }
+        .zone-right { right: 0; }
+
+        /* العلامة المائية */
         .watermark {
             position: absolute; bottom: 80px; right: 20px;
-            font-size: 0.9rem; color: rgba(255,255,255,0.3);
-            font-weight: bold; pointer-events: none; z-index: 1001;
+            font-size: 1rem; color: rgba(255,255,255,0.2);
+            font-weight: 900; pointer-events: none; z-index: 20;
+            animation: floatText 15s infinite alternate;
         }
+        @keyframes floatText { from { transform: translateX(0) rotate(0); } to { transform: translateX(-30px) rotate(5deg); } }
+
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="video-wrapper" id="videoWrapper">
-        <div id="player-container" class="w-full h-full"></div>
-
-        <div id="ytOverlay" class="yt-overlay">
-            
-            <div class="yt-header">
-                <div class="flex items-center gap-3">
-                    <button onclick="history.back()" class="text-white text-xl p-2"><i class="fas fa-arrow-right"></i></button>
-                    <h1 class="text-white text-sm font-bold truncate max-w-[200px]" id="vidTitle">...</h1>
-                </div>
-            </div>
-
-            <div class="yt-btn-container">
-                <button id="btnRewind" class="yt-btn-circle">
-                    <i class="fas fa-undo-alt text-sm"></i><span class="text-[9px] absolute mt-5 font-bold">10</span>
-                </button>
-
-                <button id="btnPlayPause" class="yt-btn-circle yt-play-big">
-                    <i class="fas fa-play ml-1" id="iconPlay"></i>
-                </button>
-
-                <button id="btnForward" class="yt-btn-circle">
-                    <i class="fas fa-redo-alt text-sm"></i><span class="text-[9px] absolute mt-5 font-bold">10</span>
-                </button>
-            </div>
+    <div class="video-wrapper" id="playerWrapper">
+        
+        <div class="custom-header" id="customHeader">
+            <div onclick="history.back()" class="back-btn"><i class="fas fa-arrow-right"></i></div>
+            <h1 class="text-white font-bold text-sm truncate max-w-[70%]" id="vidTitle">جاري التحميل...</h1>
         </div>
 
-        <div id="zoneLeft" class="dt-zone dt-left"><div class="ripple-icon" id="ripLeft"><i class="fas fa-backward"></i><span class="text-xs">10s</span></div></div>
-        <div id="zoneRight" class="dt-zone dt-right"><div class="ripple-icon" id="ripRight"><i class="fas fa-forward"></i><span class="text-xs">10s</span></div></div>
+        <div id="ripLeft" class="ripple-icon ripple-left"><i class="fas fa-undo"></i><span class="text-xs font-bold mt-1">10s</span></div>
+        <div id="ripRight" class="ripple-icon ripple-right"><i class="fas fa-redo"></i><span class="text-xs font-bold mt-1">10s</span></div>
+
+        <div id="zoneLeft" class="tap-zone zone-left"></div>
+        <div id="zoneRight" class="tap-zone zone-right"></div>
+
+        <div id="player-container" class="w-full h-full"></div>
 
         <div id="watermark" class="watermark">ID: ---</div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
+        // 1. التحقق من المستخدم
         const userCode = checkAuth();
         if(!userCode) window.location.href = 'index.html';
-        document.getElementById('watermark').innerText = "ID: " + userCode;
+        document.getElementById('watermark').innerText = userCode;
 
+        // 2. تحميل بيانات الفيديو
         const videoData = JSON.parse(localStorage.getItem('activeLecture'));
-        if(!videoData) { alert("خطأ"); history.back(); }
-        document.getElementById('vidTitle').innerText = videoData.video_name || "فيديو";
+        if(!videoData) { alert("خطأ في الفيديو"); history.back(); }
+        document.getElementById('vidTitle').innerText = videoData.video_name || videoData.name || "مشاهدة الدرس";
 
+        // 3. إعداد المشغل
         const container = document.getElementById('player-container');
-        let src = videoData.stream_url || "";
+        let src = videoData.stream_url || videoData.video_url || "";
+        src = src.trim();
 
         if(src.includes('youtube') || src.includes('youtu.be')) {
             let vidId = src.split('v=')[1]?.split('&')[0] || src.split('youtu.be/')[1]?.split('?')[0];
@@ -155,98 +152,69 @@
             container.innerHTML = `<video id="player" playsinline controls><source src="${src}" type="video/mp4" /></video>`;
         }
 
+        // تشغيل Plyr بوضع "احترافي"
         const player = new Plyr('#player', {
-            controls: ['progress', 'current-time', 'duration', 'settings', 'fullscreen'],
-            hideControls: false,
-            clickToPlay: false,
-            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' }
+            controls: [
+                'play-large', 'play', 'progress', 'current-time', 'duration', 
+                'mute', 'volume', 'settings', 'fullscreen'
+            ],
+            settings: ['quality', 'speed'],
+            speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
+            clickToPlay: true, // تفعيل الضغط للتشغيل
+            hideControls: true, // إخفاء تلقائي
+            resetOnEnd: true,
         });
 
-        // UI Logic
-        const overlay = document.getElementById('ytOverlay');
-        const iconPlay = document.getElementById('iconPlay');
-        let uiTimer;
+        // 4. ربط الهيدر بالتحكم
+        const wrapper = document.getElementById('playerWrapper');
+        
+        // لما التحكم يظهر، نظهر الهيدر بتاعنا
+        player.on('controlsshown', () => wrapper.classList.add('show-ui'));
+        // لما يختفي، نخفي الهيدر
+        player.on('controlshidden', () => wrapper.classList.remove('show-ui'));
 
-        function showUI() {
-            overlay.classList.remove('hidden-ui');
-            player.toggleControls(true);
-            clearTimeout(uiTimer);
-            if(player.playing) uiTimer = setTimeout(hideUI, 3000);
-        }
-
-        function hideUI() {
-            if(player.paused) return;
-            overlay.classList.add('hidden-ui');
-            player.toggleControls(false);
-        }
-
-        function toggleUI() {
-            if(overlay.classList.contains('hidden-ui')) showUI();
-            else hideUI();
-        }
-
-        // Button Events
-        document.getElementById('btnPlayPause').addEventListener('click', (e) => {
-            e.stopPropagation(); player.togglePlay();
-        });
-        document.getElementById('btnForward').addEventListener('click', (e) => {
-            e.stopPropagation(); player.forward(10); showUI();
-        });
-        document.getElementById('btnRewind').addEventListener('click', (e) => {
-            e.stopPropagation(); player.rewind(10); showUI();
-        });
-
-        // Player Events
-        player.on('play', () => {
-            iconPlay.className = 'fas fa-pause';
-            uiTimer = setTimeout(hideUI, 2500);
-        });
-        player.on('pause', () => {
-            iconPlay.className = 'fas fa-play ml-1';
-            showUI();
-        });
-
-        // Double Tap Logic
+        // 5. منطق اللمس المزدوج (Double Tap Logic)
         const zoneL = document.getElementById('zoneLeft');
         const zoneR = document.getElementById('zoneRight');
         let lastTap = 0;
 
-        function handleTap(e, type) {
-            e.preventDefault(); e.stopPropagation();
+        function handleDoubleTap(e, action) {
+            e.stopPropagation(); // منع تعارض مع المشغل
             const now = new Date().getTime();
             const diff = now - lastTap;
 
             if (diff < 300 && diff > 0) {
-                // Double Tap
-                if(type === 'fwd') {
+                // Double Tap Detected!
+                if(action === 'fwd') {
                     player.forward(10);
-                    animRipple('ripRight');
+                    showRipple('ripRight');
                 } else {
                     player.rewind(10);
-                    animRipple('ripLeft');
+                    showRipple('ripLeft');
                 }
             } else {
-                // Single Tap -> Toggle UI
-                toggleUI();
+                // Single Tap -> Toggle Play/Pause (Plyr بيعملها لوحده بس ده احتياطي)
+                // player.togglePlay(); 
             }
             lastTap = now;
         }
 
-        function animRipple(id) {
+        function showRipple(id) {
             const el = document.getElementById(id);
-            el.classList.add('show-ripple');
-            setTimeout(() => el.classList.remove('show-ripple'), 400);
+            el.classList.add('trigger-anim');
+            setTimeout(() => el.classList.remove('trigger-anim'), 500);
         }
 
-        zoneR.addEventListener('click', (e) => handleTap(e, 'fwd'));
-        zoneL.addEventListener('click', (e) => handleTap(e, 'rew'));
+        // استخدام click للتعرف على الدبل تاب داخل المناطق المحددة
+        zoneR.addEventListener('click', (e) => handleDoubleTap(e, 'fwd'));
+        zoneL.addEventListener('click', (e) => handleDoubleTap(e, 'rew'));
 
-        // لمسة عامة على الشاشة لإظهار التحكم
-        overlay.addEventListener('click', (e) => {
-            if(e.target === overlay) toggleUI();
+        // منع التكبير باللمس المزدوج للمتصفح نفسه
+        wrapper.addEventListener('dblclick', (e) => {
+            e.preventDefault();
         });
 
-        showUI();
     </script>
 </body>
 </html>
