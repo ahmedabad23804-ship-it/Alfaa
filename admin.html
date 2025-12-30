@@ -2,386 +2,392 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>لوحة القيادة | FULL MARK</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #0f172a; color: white; }
+        body { font-family: 'Cairo', sans-serif; background: #0f172a; color: white; padding-bottom: 80px; }
         
-        /* Glass Effect */
-        .glass {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
+        /* تنسيق التنقل السفلي للموبايل */
+        .mobile-nav {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: #1e293b; border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex; justify-content: space-around; padding: 10px 0;
+            z-index: 50; box-shadow: 0 -4px 20px rgba(0,0,0,0.3);
         }
+        .nav-btn {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            color: #64748b; font-size: 0.75rem; font-weight: bold; transition: 0.3s;
+            background: none; border: none; flex: 1;
+        }
+        .nav-btn i { font-size: 1.4rem; margin-bottom: 4px; }
+        .nav-btn.active { color: #6366f1; }
+        .nav-btn.active i { transform: translateY(-2px); filter: drop-shadow(0 0 8px rgba(99, 102, 241, 0.5)); }
 
-        /* Sidebar Links */
-        .nav-item {
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            color: #94a3b8;
-        }
-        .nav-item:hover, .nav-item.active {
-            background: linear-gradient(90deg, #6366f1 0%, #4338ca 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-            transform: translateX(-5px);
-        }
-
-        /* Custom Inputs */
+        /* تنسيق الحقول */
         input, select {
-            background: #1e293b !important;
-            border: 1px solid #334155 !important;
-            color: white !important;
-            transition: 0.3s;
+            background: #1e293b !important; border: 1px solid #334155 !important;
+            color: white !important; font-size: 1rem; padding: 12px; border-radius: 12px;
+            width: 100%; outline: none; transition: 0.3s;
         }
-        input:focus, select:focus {
-            border-color: #6366f1 !important;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        input:focus, select:focus { border-color: #6366f1 !important; }
+
+        /* الكروت */
+        .glass-panel {
+            background: #1e293b; border-radius: 20px; padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* Tables */
-        .table-row { transition: 0.2s; cursor: pointer; }
-        .table-row:hover { background: rgba(99, 102, 241, 0.1); }
+        /* إخفاء الصفحات */
+        .page-section { display: none; animation: fadeIn 0.3s ease; }
+        .page-section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* زرار النسخ */
+        .copy-btn:active { transform: scale(0.9); }
     </style>
 </head>
-<body class="min-h-screen flex overflow-hidden">
+<body>
 
-    <aside class="w-64 glass m-4 p-6 flex flex-col hidden md:flex">
-        <div class="mb-10 text-center">
-            <h1 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-cyan-400 tracking-wider">FULL MARK</h1>
-            <p class="text-xs text-gray-500 font-bold tracking-[0.3em] mt-1">ADMIN PANEL</p>
+    <header class="p-5 flex justify-between items-center bg-[#1e293b] shadow-lg sticky top-0 z-40">
+        <div>
+            <h1 class="text-xl font-black text-indigo-400 tracking-wider">FULL MARK</h1>
+            <p class="text-[10px] text-gray-400">لوحة التحكم الإدارية</p>
         </div>
+        <div class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold">A</div>
+    </header>
 
-        <nav class="flex-1">
-            <div onclick="switchPage('generate')" id="nav-generate" class="nav-item active p-4 flex items-center gap-3">
-                <i class="fas fa-qrcode text-lg"></i>
-                <span class="font-bold">إصدار كود جديد</span>
-            </div>
-            <div onclick="switchPage('students')" id="nav-students" class="nav-item p-4 flex items-center gap-3">
-                <i class="fas fa-users text-lg"></i>
-                <span class="font-bold">سجلات الطلاب</span>
-            </div>
-            <div onclick="switchPage('analytics')" id="nav-analytics" class="nav-item p-4 flex items-center gap-3">
-                <i class="fas fa-chart-pie text-lg"></i>
-                <span class="font-bold">الإحصائيات والأرباح</span>
-            </div>
-        </nav>
-
-        <div class="text-center pt-4 border-t border-gray-700">
-            <p class="text-[10px] text-gray-500">تم التطوير بواسطة</p>
-            <p class="font-bold text-indigo-400" style="letter-spacing: 2px;">ELGIZAWY</p>
-        </div>
-    </aside>
-
-    <main class="flex-1 p-4 md:p-8 overflow-y-auto">
+    <main class="p-4">
         
-        <section id="page-generate" class="page-section">
-            <header class="mb-8 flex justify-between items-center">
-                <div>
-                    <h2 class="text-3xl font-bold mb-1">إصدار كود جديد</h2>
-                    <p class="text-gray-400 text-sm">قم بملء البيانات لاستخراج كود تفعيل للطالب</p>
-                </div>
-                <div class="bg-indigo-600/20 p-3 rounded-xl text-indigo-400">
-                    <i class="fas fa-fingerprint text-2xl"></i>
-                </div>
-            </header>
+        <section id="page-home" class="page-section active">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-qrcode text-indigo-500"></i> إصدار كود جديد
+            </h2>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass p-8">
-                    <div class="space-y-5">
+            <div class="glass-panel">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm text-gray-400 mb-1 block">اسم الطالب</label>
+                        <input type="text" id="stdName" placeholder="اسم الطالب ثلاثي">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="text-sm text-gray-400 mb-1 block">اسم الطالب</label>
-                            <input type="text" id="stdName" class="w-full p-4 rounded-xl outline-none" placeholder="اكتب الاسم ثلاثي...">
+                            <label class="text-sm text-gray-400 mb-1 block">الشعبة</label>
+                            <select id="stdSection">
+                                <option value="علمي علوم">🧪 علوم</option>
+                                <option value="علمي رياضة">📐 رياضة</option>
+                                <option value="أدبي">📚 أدبي</option>
+                                <option value="أزهر">🕌 أزهر</option>
+                            </select>
                         </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-sm text-gray-400 mb-1 block">الشعبة</label>
-                                <select id="stdSection" class="w-full p-4 rounded-xl outline-none">
-                                    <option value="علمي علوم">🧪 علمي علوم</option>
-                                    <option value="علمي رياضة">📐 علمي رياضة</option>
-                                    <option value="أدبي">📚 أدبي</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-sm text-gray-400 mb-1 block">نوع الاشتراك</label>
-                                <select id="subType" class="w-full p-4 rounded-xl outline-none" onchange="updatePricePlaceholder()">
-                                    <option value="month">📅 شهر كامل</option>
-                                    <option value="trial">⏳ تجريبي (ساعة واحدة)</option>
-                                </select>
-                            </div>
-                        </div>
-
                         <div>
-                            <label class="text-sm text-gray-400 mb-1 block">سعر الكود (جنية)</label>
-                            <input type="number" id="codePrice" class="w-full p-4 rounded-xl outline-none" placeholder="حدد السعر..." value="150">
-                        </div>
-
-                        <button onclick="generateNewCode()" class="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 p-4 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition-all active:scale-95 mt-4">
-                            <i class="fas fa-bolt ml-2"></i> توليد الكود فوراً
-                        </button>
-                    </div>
-                </div>
-
-                <div class="glass p-8 flex flex-col justify-center items-center text-center relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
-                    
-                    <div id="resultArea" class="hidden w-full">
-                        <div class="mb-6">
-                            <i class="fas fa-check-circle text-5xl text-green-500 mb-4"></i>
-                            <h3 class="text-2xl font-bold">تم إنشاء الكود بنجاح!</h3>
-                            <p class="text-gray-400 text-sm mt-2">بيانات الطالب محفوظة في قاعدة البيانات</p>
-                        </div>
-
-                        <div class="bg-[#0f172a] border border-dashed border-indigo-500/50 p-6 rounded-2xl mb-6 relative group">
-                            <p class="text-gray-500 text-xs mb-2 tracking-widest uppercase">كود التفعيل</p>
-                            <h2 id="generatedCodeDisplay" class="text-4xl font-mono font-bold text-indigo-400 tracking-wider">---</h2>
-                            
-                            <button onclick="copyCode()" class="absolute top-1/2 -translate-y-1/2 left-4 bg-indigo-600 hover:bg-indigo-500 text-white w-10 h-10 rounded-lg flex items-center justify-center transition shadow-lg" title="نسخ الكود">
-                                <i class="fas fa-copy"></i>
-                            </button>
-                        </div>
-
-                        <div class="flex justify-between text-sm text-gray-400 bg-white/5 p-4 rounded-xl">
-                            <span><i class="fas fa-money-bill-wave ml-2 text-green-400"></i> السعر: <span id="resPrice" class="text-white font-bold">0</span> ج.م</span>
-                            <span><i class="fas fa-clock ml-2 text-blue-400"></i> الصلاحية: <span id="resType" class="text-white font-bold">-</span></span>
+                            <label class="text-sm text-gray-400 mb-1 block">المدة</label>
+                            <select id="subType" onchange="togglePrice()">
+                                <option value="month">📅 شهر كامل</option>
+                                <option value="trial">⏳ تجريبي (ساعة)</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div id="placeholderArea" class="text-gray-500">
-                        <i class="fas fa-qrcode text-6xl mb-4 opacity-20"></i>
-                        <p>بانتظار إنشاء كود جديد...</p>
+                    <div id="priceField">
+                        <label class="text-sm text-gray-400 mb-1 block">سعر الكود</label>
+                        <input type="number" id="codePrice" value="150">
                     </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="page-students" class="page-section hidden">
-            <header class="mb-8">
-                <h2 class="text-3xl font-bold mb-2">إدارة المشتركين</h2>
-                <div class="flex gap-4">
-                    <input type="text" id="searchBox" onkeyup="filterStudents()" placeholder="بحث بالاسم أو الكود..." class="p-3 rounded-xl text-sm w-64 bg-slate-800">
-                </div>
-            </header>
-
-            <div class="mb-8">
-                <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-indigo-400">
-                    <i class="fas fa-crown"></i> المشتركين (الاشتراك الشهري)
-                </h3>
-                <div class="overflow-x-auto rounded-2xl border border-gray-700">
-                    <table class="w-full text-right bg-slate-800/50">
-                        <thead class="bg-slate-900 text-gray-400 text-xs uppercase">
-                            <tr>
-                                <th class="p-4">الطالب</th>
-                                <th class="p-4">الكود</th>
-                                <th class="p-4">الشعبة</th>
-                                <th class="p-4">تاريخ الانتهاء</th>
-                                <th class="p-4 text-center">الحالة</th>
-                            </tr>
-                        </thead>
-                        <tbody id="subscribersTable"></tbody>
-                    </table>
+                    <button onclick="generateCode()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg shadow-indigo-600/30 transition active:scale-95 flex items-center justify-center gap-2">
+                        <i class="fas fa-bolt"></i> توليد الكود فوراً
+                    </button>
                 </div>
             </div>
 
-            <div>
-                <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-amber-400">
-                    <i class="fas fa-stopwatch"></i> الفترة التجريبية (ساعة واحدة)
-                </h3>
-                <div class="overflow-x-auto rounded-2xl border border-gray-700">
-                    <table class="w-full text-right bg-slate-800/50">
-                        <thead class="bg-slate-900 text-gray-400 text-xs uppercase">
-                            <tr>
-                                <th class="p-4">الطالب</th>
-                                <th class="p-4">الكود</th>
-                                <th class="p-4">وقت التسجيل</th>
-                                <th class="p-4">وقت الانتهاء</th>
-                                <th class="p-4 text-center">الإجراء</th>
-                            </tr>
-                        </thead>
-                        <tbody id="trialsTable"></tbody>
-                    </table>
-                </div>
-            </div>
-        </section>
-
-        <section id="page-analytics" class="page-section hidden">
-            <header class="mb-8">
-                <h2 class="text-3xl font-bold mb-1">لوحة الإحصائيات</h2>
-                <p class="text-gray-400 text-sm">نظرة عامة على الأداء والأرباح</p>
-            </header>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="glass p-6 border-b-4 border-green-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">إجمالي الأرباح</p>
-                            <h2 class="text-4xl font-black text-green-400"><span id="totalRevenue">0</span> <span class="text-sm">ج.م</span></h2>
-                        </div>
-                        <div class="p-3 bg-green-500/20 rounded-lg text-green-400"><i class="fas fa-sack-dollar text-xl"></i></div>
-                    </div>
-                </div>
-
-                <div class="glass p-6 border-b-4 border-indigo-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">أكواد الشهر (مباعة)</p>
-                            <h2 class="text-4xl font-black text-white" id="monthCount">0</h2>
-                        </div>
-                        <div class="p-3 bg-indigo-500/20 rounded-lg text-indigo-400"><i class="fas fa-receipt text-xl"></i></div>
-                    </div>
-                </div>
-
-                <div class="glass p-6 border-b-4 border-amber-500">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <p class="text-gray-400 text-sm mb-1">أكواد تجريبية</p>
-                            <h2 class="text-4xl font-black text-white" id="trialCount">0</h2>
-                        </div>
-                        <div class="p-3 bg-amber-500/20 rounded-lg text-amber-400"><i class="fas fa-flask text-xl"></i></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="glass p-6 flex flex-col items-center justify-center">
-                    <h3 class="text-lg font-bold mb-6 w-full text-right border-b border-gray-700 pb-2">توزيع الشعب الدراسية</h3>
-                    <div class="w-64 h-64">
-                        <canvas id="sectionsChart"></canvas>
-                    </div>
-                </div>
+            <div id="resultBox" class="glass-panel hidden text-center relative overflow-hidden border-2 border-indigo-500/30">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-purple-500"></div>
+                <h3 class="text-lg font-bold text-white mb-1">تم الإنشاء بنجاح! ✅</h3>
+                <p class="text-xs text-gray-400 mb-4">اضغط على الكود لنسخه</p>
                 
-                <div class="glass p-6">
-                    <h3 class="text-lg font-bold mb-6 border-b border-gray-700 pb-2">تفاصيل سريعة</h3>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
-                            <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-blue-500"></div> علمي علوم</span>
-                            <span class="font-bold font-mono" id="sciCount">0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
-                            <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-red-500"></div> علمي رياضة</span>
-                            <span class="font-bold font-mono" id="mathCount">0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-slate-800 rounded-lg">
-                            <span class="flex items-center gap-2"><div class="w-3 h-3 rounded-full bg-yellow-500"></div> أدبي</span>
-                            <span class="font-bold font-mono" id="litCount">0</span>
-                        </div>
-                    </div>
+                <div onclick="copyToClipboard()" class="bg-[#0f172a] p-4 rounded-xl border border-dashed border-gray-600 cursor-pointer active:bg-gray-800 transition group relative">
+                    <h2 id="finalCode" class="text-3xl font-mono font-bold text-indigo-400 tracking-widest">---</h2>
+                    <span class="absolute right-3 top-3 text-gray-600 text-xs"><i class="fas fa-copy"></i></span>
+                </div>
+
+                <div class="flex justify-between mt-4 text-sm font-bold bg-white/5 p-3 rounded-lg">
+                    <span class="text-green-400" id="resPriceDisplay">0 ج.م</span>
+                    <span class="text-blue-400" id="resTypeDisplay">شهر</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-students" class="page-section">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-users text-indigo-500"></i> إدارة الطلاب
+            </h2>
+
+            <div class="mb-4">
+                <input type="text" id="searchInput" onkeyup="filterList()" placeholder="🔍 ابحث بالاسم أو الكود..." style="padding: 10px;">
+            </div>
+
+            <div class="flex bg-[#1e293b] p-1 rounded-xl mb-4 border border-gray-700">
+                <button onclick="showList('active')" id="tab-active" class="flex-1 py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition">المشتركين</button>
+                <button onclick="showList('trial')" id="tab-trial" class="flex-1 py-2 rounded-lg text-sm font-bold text-gray-400 transition">التجريبي</button>
+            </div>
+
+            <div class="overflow-y-auto" style="max-height: 60vh;">
+                <table class="w-full text-sm text-right">
+                    <thead class="text-xs text-gray-500 bg-[#1e293b] uppercase">
+                        <tr>
+                            <th class="px-3 py-3">الطالب</th>
+                            <th class="px-3 py-3">الكود</th>
+                            <th class="px-3 py-3 text-center">الإجراء</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        </tbody>
+                </table>
+                <p id="emptyMsg" class="text-center text-gray-500 mt-10 hidden">لا توجد بيانات حالياً</p>
+            </div>
+        </section>
+
+        <section id="page-stats" class="page-section">
+            <h2 class="text-2xl font-bold mb-4 flex items-center gap-2">
+                <i class="fas fa-chart-pie text-indigo-500"></i> الإحصائيات والأرباح
+            </h2>
+
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <p class="text-xs text-gray-400 mb-1">إجمالي الأرباح</p>
+                    <h3 class="text-2xl font-black text-green-400" id="statRevenue">0</h3>
+                    <span class="text-[10px] text-gray-500">جنية مصري</span>
+                </div>
+                <div class="glass-panel p-4 flex flex-col items-center justify-center text-center">
+                    <p class="text-xs text-gray-400 mb-1">عدد المشتركين</p>
+                    <h3 class="text-2xl font-black text-white" id="statCount">0</h3>
+                    <span class="text-[10px] text-gray-500">طالب نشط</span>
+                </div>
+            </div>
+
+            <div class="glass-panel">
+                <h3 class="text-sm font-bold mb-4 border-b border-gray-700 pb-2">توزيع الشعب</h3>
+                <div style="height: 200px; position: relative;">
+                    <canvas id="myChart"></canvas>
+                </div>
+            </div>
+
+            <div class="mt-4 space-y-2">
+                <div class="flex justify-between p-3 bg-[#1e293b] rounded-lg border border-gray-700">
+                    <span class="text-sm"><i class="fas fa-flask text-blue-400 ml-2"></i>علمي علوم</span>
+                    <span class="font-bold" id="cntSci">0</span>
+                </div>
+                <div class="flex justify-between p-3 bg-[#1e293b] rounded-lg border border-gray-700">
+                    <span class="text-sm"><i class="fas fa-ruler-combined text-red-400 ml-2"></i>علمي رياضة</span>
+                    <span class="font-bold" id="cntMath">0</span>
+                </div>
+                <div class="flex justify-between p-3 bg-[#1e293b] rounded-lg border border-gray-700">
+                    <span class="text-sm"><i class="fas fa-book text-yellow-400 ml-2"></i>أدبي</span>
+                    <span class="font-bold" id="cntLit">0</span>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <div id="studentModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center">
-        <div class="glass w-full max-w-md p-6 m-4 relative transform transition-all scale-100">
-            <button onclick="closeModal()" class="absolute top-4 left-4 text-gray-400 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+    <nav class="mobile-nav md:hidden">
+        <button onclick="navTo('home')" class="nav-btn active" id="btn-home">
+            <i class="fas fa-plus-square"></i>
+            <span>إصدار</span>
+        </button>
+        <button onclick="navTo('students')" class="nav-btn" id="btn-students">
+            <i class="fas fa-user-graduate"></i>
+            <span>الطلاب</span>
+        </button>
+        <button onclick="navTo('stats')" class="nav-btn" id="btn-stats">
+            <i class="fas fa-chart-bar"></i>
+            <span>أرباحي</span>
+        </button>
+    </nav>
+
+    <div id="actionModal" class="fixed inset-0 bg-black/90 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-[#1e293b] w-full max-w-sm rounded-2xl p-6 relative border border-gray-700">
+            <button onclick="closeModal()" class="absolute top-4 left-4 text-gray-400 text-xl"><i class="fas fa-times"></i></button>
             
             <div class="text-center mb-6">
-                <div class="w-16 h-16 bg-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold" id="modalInitials">A</div>
-                <h3 class="text-2xl font-bold" id="modalName">اسم الطالب</h3>
-                <p class="text-indigo-400 font-mono text-sm" id="modalCode">CODE</p>
+                <div class="w-16 h-16 bg-indigo-600 rounded-full mx-auto mb-3 flex items-center justify-center text-2xl font-bold" id="mInitials">M</div>
+                <h3 class="text-xl font-bold text-white" id="mName">اسم الطالب</h3>
+                <p class="text-indigo-400 font-mono text-sm tracking-widest" id="mCode">FM-12345</p>
             </div>
 
             <div class="space-y-3">
-                <button onclick="renewSubscription()" class="w-full p-3 bg-green-600 hover:bg-green-500 rounded-xl font-bold flex items-center justify-center gap-2">
-                    <i class="fas fa-calendar-plus"></i> تجديد الاشتراك (30 يوم)
+                <button onclick="renewUser()" class="w-full bg-green-600 hover:bg-green-500 text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                    <i class="fas fa-history"></i> تجديد 30 يوم
                 </button>
-                <button onclick="toggleBlockUser()" id="btnBlock" class="w-full p-3 bg-orange-600 hover:bg-orange-500 rounded-xl font-bold flex items-center justify-center gap-2">
+                <button onclick="blockUser()" id="btnBlock" class="w-full bg-orange-600 hover:bg-orange-500 text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2">
                     <i class="fas fa-ban"></i> حظر الطالب
                 </button>
-                <button onclick="deleteUser()" class="w-full p-3 bg-red-600/20 text-red-500 hover:bg-red-600 hover:text-white border border-red-600/50 rounded-xl font-bold flex items-center justify-center gap-2">
-                    <i class="fas fa-trash-alt"></i> حذف نهائي
+                <button onclick="deleteUser()" class="w-full bg-red-600/20 text-red-500 border border-red-500/50 hover:bg-red-600 hover:text-white p-3 rounded-xl font-bold flex items-center justify-center gap-2">
+                    <i class="fas fa-trash"></i> حذف نهائي
                 </button>
             </div>
         </div>
     </div>
 
     <script>
-        // --- 1. إعدادات Firebase ---
-        const firebaseConfig = { databaseURL: "https://fullmark-2025-default-rtdb.firebaseio.com" }; // حط رابط الداتا بيز بتاعتك هنا
+        // ================= إعدادات Firebase =================
+        const firebaseConfig = { databaseURL: "https://fullmark-2025-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // متغيرات عامة
-        let currentStudentId = null;
-        let chartInstance = null;
+        // متغيرات
+        let currentView = 'active'; // active or trial
+        let selectedCode = null;
+        let chart = null;
 
-        // --- 2. التنقل بين الصفحات ---
-        function switchPage(pageId) {
-            document.querySelectorAll('.page-section').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`page-${pageId}`).classList.remove('hidden');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-            document.getElementById(`nav-${pageId}`).classList.add('active');
+        // ================= التنقل =================
+        function navTo(page) {
+            // إخفاء كل الصفحات
+            document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active'));
+            document.getElementById('page-' + page).classList.add('active');
 
-            if (pageId === 'students' || pageId === 'analytics') loadData();
+            // تحديث الأزرار
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('btn-' + page).classList.add('active');
+
+            if(page === 'students' || page === 'stats') loadData();
         }
 
-        function updatePricePlaceholder() {
+        function togglePrice() {
             const type = document.getElementById('subType').value;
+            const priceDiv = document.getElementById('priceField');
             const priceInp = document.getElementById('codePrice');
-            if (type === 'trial') priceInp.value = 0;
-            else priceInp.value = 150;
+            
+            if(type === 'trial') {
+                priceDiv.style.opacity = '0.5';
+                priceInp.value = 0;
+                priceInp.disabled = true;
+            } else {
+                priceDiv.style.opacity = '1';
+                priceInp.value = 150;
+                priceInp.disabled = false;
+            }
         }
 
-        // --- 3. توليد الكود ---
-        async function generateNewCode() {
+        // ================= الوظائف الأساسية =================
+        async function generateCode() {
             const name = document.getElementById('stdName').value.trim();
             const section = document.getElementById('stdSection').value;
-            const type = document.getElementById('subType').value; // 'month' or 'trial'
-            const price = parseFloat(document.getElementById('codePrice').value) || 0;
+            const type = document.getElementById('subType').value;
+            const price = document.getElementById('codePrice').value;
 
-            if (!name) return alert("❌ يرجى كتابة اسم الطالب");
+            if(!name) return alert('⚠️ اكتب اسم الطالب الأول');
 
-            // توليد كود عشوائي
+            const btn = document.querySelector('button[onclick="generateCode()"]');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإنشاء...';
+            btn.disabled = true;
+
             const code = 'FM-' + Math.floor(100000 + Math.random() * 900000);
-            
-            // حساب تاريخ الانتهاء
             const now = new Date();
-            let expiryDate = new Date();
-            
-            if (type === 'trial') {
-                expiryDate.setHours(expiryDate.getHours() + 1); // ساعة واحدة
-            } else {
-                expiryDate.setDate(expiryDate.getDate() + 30); // 30 يوم
-            }
+            let expiry = new Date();
+
+            if(type === 'trial') expiry.setHours(expiry.getHours() + 1);
+            else expiry.setDate(expiry.getDate() + 30);
 
             try {
                 await db.ref('approvedStudents/' + code).set({
                     studentName: name,
                     section: section,
                     subscriptionType: type,
-                    price: price,
-                    expiryDate: expiryDate.getTime(),
-                    isBlocked: false,
-                    createdAt: now.getTime()
+                    price: parseFloat(price),
+                    expiryDate: expiry.getTime(),
+                    createdAt: now.getTime(),
+                    isBlocked: false
                 });
 
                 // عرض النتيجة
-                document.getElementById('placeholderArea').classList.add('hidden');
-                document.getElementById('resultArea').classList.remove('hidden');
+                document.getElementById('resultBox').classList.remove('hidden');
+                document.getElementById('finalCode').innerText = code;
+                document.getElementById('resPriceDisplay').innerText = price + ' ج.م';
+                document.getElementById('resTypeDisplay').innerText = (type === 'trial') ? 'تجريبي' : 'شهر';
                 
-                document.getElementById('generatedCodeDisplay').innerText = code;
-                document.getElementById('resPrice').innerText = price;
-                document.getElementById('resType').innerText = (type === 'trial') ? 'تجريبي (ساعة)' : 'شهر كامل';
+                // إعادة الزر
+                btn.innerHTML = '<i class="fas fa-check"></i> تم الإنشاء';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fas fa-bolt"></i> توليد كود جديد';
+                    btn.disabled = false;
+                    document.getElementById('stdName').value = '';
+                }, 2000);
 
-                // تنظيف الفورم
-                document.getElementById('stdName').value = '';
-
-            } catch (err) {
-                alert("حدث خطأ: " + err.message);
+            } catch (error) {
+                alert('خطأ: تأكد من الاتصال بالإنترنت');
+                btn.innerHTML = 'حاول مرة أخرى';
+                btn.disabled = false;
             }
         }
 
-    
+        function copyToClipboard() {
+            const code = document.getElementById('finalCode').innerText;
+            navigator.clipboard.writeText(code);
+            alert('تم نسخ الكود: ' + code);
+        }
+
+        // ================= إدارة الطلاب =================
+        function showList(type) {
+            currentView = type;
+            document.getElementById('tab-active').className = type === 'active' ? 'flex-1 py-2 rounded-lg text-sm font-bold bg-indigo-600 text-white transition' : 'flex-1 py-2 rounded-lg text-sm font-bold text-gray-400 transition';
+            document.getElementById('tab-trial').className = type === 'trial' ? 'flex-1 py-2 rounded-lg text-sm font-bold bg-amber-600 text-white transition' : 'flex-1 py-2 rounded-lg text-sm font-bold text-gray-400 transition';
+            loadData();
+        }
+
+        function loadData() {
+            db.ref('approvedStudents').on('value', snap => {
+                const data = snap.val() || {};
+                const tbody = document.getElementById('studentsTableBody');
+                tbody.innerHTML = '';
+                
+                let stats = { rev: 0, count: 0, sci: 0, math: 0, lit: 0 };
+                let hasData = false;
+
+                for(let code in data) {
+                    const s = data[code];
+                    const isTrial = s.subscriptionType === 'trial';
+                    
+                    // حساب الإحصائيات
+                    stats.rev += (s.price || 0);
+                    if(!isTrial) stats.count++;
+                    if(s.section.includes('علوم')) stats.sci++;
+                    else if(s.section.includes('رياضة')) stats.math++;
+                    else stats.lit++;
+
+                    // فلترة الجدول
+                    if( (currentView === 'active' && !isTrial) || (currentView === 'trial' && isTrial) ) {
+                        hasData = true;
+                        let statusColor = s.isBlocked ? 'text-red-500' : 'text-gray-300';
+                        let rowHtml = `
+                            <tr class="border-b border-gray-700 hover:bg-white/5 transition">
+                                <td class="px-3 py-4">
+                                    <div class="font-bold text-white">${s.studentName}</div>
+                                    <div class="text-[10px] text-gray-400">${s.section}</div>
+                                </td>
+                                <td class="px-3 py-4 font-mono text-indigo-400 ${statusColor}">${code}</td>
+                                <td class="px-3 py-4 text-center">
+                                    <button onclick="openModal('${code}', '${s.studentName}', ${s.isBlocked})" class="bg-[#0f172a] text-gray-300 px-3 py-1 rounded-lg text-xs border border-gray-600">خيارات</button>
+                                </td>
+                            </tr>
+                        `;
+                        tbody.innerHTML += rowHtml;
+                    }
+                }
+
+                document.getElementById('emptyMsg').style.display = hasData ? 'none' : 'block';
+                
+                // تحديث صفحة الإحصائيات
+                document.getElementById('statRevenue').innerText = stats.rev.toLocaleString();
+                document.getElementById('statCount').innerText = stats.count;
+                document.getElementById('cntSci').innerText = stats.sci;
+                document.getE
