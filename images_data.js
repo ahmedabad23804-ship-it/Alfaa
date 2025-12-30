@@ -1,13 +1,18 @@
 const IMAGES_DB = {
+    // الصور في الفولدر الأول (images)
     "لغة عربية": "images/arabic.jpg",
-    "English": "images/english.jpg",
     "فيزياء": "images/physics.jpg",
     "كيمياء": "images/chemistry.jpg",
     "أحياء": "images/biology.jpg",
     "رياضيات": "images/math.jpg",
     "تاريخ": "images/history.jpg",
     "جغرافيا": "images/geo.jpg",
-    "فرنساوي": "images/french.jpg",
-    "جيولوجيا": "images/geo.jpg", 
-    "default": "images/english.jpg"
+    "جيولوجيا": "images/geo.jpg",
+
+    // الصور في الفولدر الثاني (more_images)
+    "English": "more_images/english.jpg",
+    "فرنساوي": "more_images/french.jpg",
+    
+    // الصورة الاحتياطية
+    "default": "images/arabic.jpg"
 };
