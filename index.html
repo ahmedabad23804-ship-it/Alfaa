@@ -86,17 +86,62 @@
         .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5); }
         .login-btn:disabled { opacity: 0.7; cursor: wait; }
 
-        /* ⏱️ قسم العد التنازلي (الدخول التلقائي) */
+        /* ⏱️ قسم الدخول التلقائي (المحسن) */
         #autoLoginSection { display: none; }
-        .countdown-circle {
-            width: 80px; height: 80px; margin: 0 auto 20px;
-            border-radius: 50%; border: 4px solid var(--accent-gold);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 2.5rem; font-weight: 900; color: var(--accent-gold);
-            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
-            animation: pulse 1s infinite;
+        
+        /* حاوية الجمل التحفيزية */
+        .motivation-container {
+            margin-bottom: 20px;
+            min-height: 60px; /* ارتفاع ثابت لتجنب الاهتزاز */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .motivation-text {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: var(--accent-gold);
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        .motivation-text.active { opacity: 1; }
+
+        /* العداد الدائري الجديد */
+        .countdown-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
+        }
+
+        .progress-ring {
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .progress-ring__circle-bg {
+            stroke: rgba(251, 191, 36, 0.2);
+        }
+
+        .progress-ring__circle {
+            stroke: var(--accent-gold);
+            stroke-dasharray: 326.7256; /* 2 * pi * r (r=52) */
+            stroke-dashoffset: 326.7256;
+            transition: stroke-dashoffset 1s linear;
+            filter: drop-shadow(0 0 8px var(--accent-gold));
+        }
+
+        .timer-display {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--accent-gold);
+        }
         
         .welcome-text { color: #fff; font-size: 1.2rem; margin-bottom: 5px; font-weight: bold; }
         .code-badge { 
@@ -147,8 +192,18 @@
         <div id="autoLoginSection">
             <div class="welcome-text">مرحباً بك مجدداً 👋</div>
             <div class="code-badge" id="savedCodeDisplay">...</div>
+
+            <div class="motivation-container">
+                <p class="motivation-text active" id="motivationText">...</p>
+            </div>
             
-            <div class="countdown-circle" id="timerDisplay">5</div>
+            <div class="countdown-container">
+                <svg class="progress-ring" width="120" height="120">
+                    <circle class="progress-ring__circle-bg" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                    <circle class="progress-ring__circle" stroke-width="8" fill="transparent" r="52" cx="60" cy="60"/>
+                </svg>
+                <div class="timer-display" id="timerDisplay">5</div>
+            </div>
             
             <p class="text-gray-400 text-xs mb-4">جاري الدخول التلقائي...</p>
             
@@ -184,9 +239,31 @@
         const timerDisplay = document.getElementById('timerDisplay');
         const savedCodeDisplay = document.getElementById('savedCodeDisplay');
         const statusMsg = document.getElementById('statusMessage');
+        const motivationText = document.getElementById('motivationText');
+        const progressCircle = document.querySelector('.progress-ring__circle');
         let autoLoginTimer;
+        let motivationTimer;
 
-        // 3. Helper Functions
+        // 3. Motivation Quotes
+        const quotes = [
+            "🚀 استعد للانطلاق نحو التفوق!",
+            "💪 كل دقيقة تذاكرها تقربك من حلمك.",
+            "🌟 أنت قادر على تحقيق المستحيل.",
+            "💎 اجعل هدفك دائماً الـ Full Mark.",
+            "🔥 المستقبل المشرق ينتظرك."
+        ];
+        let quoteIndex = 0;
+
+        function changeMotivation() {
+            motivationText.classList.remove('active');
+            setTimeout(() => {
+                motivationText.innerText = quotes[quoteIndex];
+                motivationText.classList.add('active');
+                quoteIndex = (quoteIndex + 1) % quotes.length;
+            }, 500); // Wait for fade out
+        }
+
+        // 4. Helper Functions
         function showMsg(text, type) {
             statusMsg.textContent = text;
             statusMsg.style.display = 'block';
@@ -209,8 +286,14 @@
             }
             return did;
         }
+        
+        function setProgress(percent) {
+            const circumference = 326.7256;
+            const offset = circumference - (percent / 100) * circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
 
-        // 4. Check for Saved Code (Auto Login Logic)
+        // 5. Check for Saved Code (Auto Login Logic)
         const savedCode = localStorage.getItem('alpha_user_code');
         
         if (savedCode) {
@@ -219,18 +302,26 @@
             autoLoginSection.style.display = 'block';
             savedCodeDisplay.innerText = savedCode;
             
+            // بدء الجمل التحفيزية
+            changeMotivation();
+            motivationTimer = setInterval(changeMotivation, 2500); // Change every 2.5s
+
             // بدء العداد التنازلي
             let seconds = 5;
             timerDisplay.innerText = seconds;
-            
+            setProgress(100); // Start full
+
             // التحقق من صحة الكود في الخلفية أثناء العد
             checkCode(savedCode, true).then(isValid => {
                 if(isValid) {
                     autoLoginTimer = setInterval(() => {
                         seconds--;
                         timerDisplay.innerText = seconds;
+                        setProgress((seconds / 5) * 100); // Update progress ring
+                        
                         if (seconds <= 0) {
                             clearInterval(autoLoginTimer);
+                            clearInterval(motivationTimer);
                             window.location.href = 'subjects.html'; // توجيه
                         }
                     }, 1000);
@@ -244,12 +335,13 @@
 
         function cancelAutoLogin() {
             clearInterval(autoLoginTimer);
+            clearInterval(motivationTimer);
             localStorage.removeItem('alpha_user_code');
             autoLoginSection.style.display = 'none';
             loginForm.style.display = 'block';
         }
 
-        // 5. Manual Login Logic
+        // 6. Manual Login Logic
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const code = document.getElementById('activationCode').value.trim();
@@ -272,7 +364,7 @@
             }
         });
 
-        // 6. Validation Function (Core Logic)
+        // 7. Validation Function (Core Logic)
         async function checkCode(code, isSilent) {
             try {
                 const snap = await db.ref('approvedStudents/' + code).once('value');
@@ -302,5 +394,4 @@
         }
     </script>
 </body>
-    </html>
-    
+</html>
