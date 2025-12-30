@@ -24,17 +24,16 @@
 
         /* تعديلات Plyr */
         :root { --plyr-color-main: #ff0000; }
-        .plyr__control--overlaid { display: none !important; } /* إخفاء زر التشغيل الأصلي */
+        .plyr__control--overlaid { display: none !important; }
         
-        /* شريط التحكم السفلي */
         .plyr__controls {
             z-index: 1000 !important;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
             padding-bottom: 30px !important;
-            padding-top: 50px !important;
+            padding-top: 60px !important;
         }
 
-        /* ==================== طبقة التحكم (الأزرار فقط) ==================== */
+        /* ==================== طبقة التحكم ==================== */
         .yt-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 50; 
@@ -47,28 +46,64 @@
         .yt-header {
             padding: 20px; display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            transition: 0.3s;
+        }
+
+        .header-btn {
+            color: white; font-size: 1.2rem; padding: 10px; border-radius: 50%;
+            background: rgba(255,255,255,0.1); width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: 0.3s;
+        }
+        .header-btn:hover { background: rgba(255,255,255,0.3); }
+
+        .video-title {
+            color: white; font-size: 0.9rem; font-weight: bold;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
         }
 
         /* حاوية الأزرار في المنتصف */
         .center-controls {
-            display: flex; align-items: center; justify-content: center; gap: 40px;
+            display: flex; align-items: center; justify-content: center; gap: 30px;
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 100%;
         }
 
+        /* تصميم الزراير (الموبايل هو الأساس) */
         .yt-btn {
-            width: 55px; height: 55px; border-radius: 50%;
+            width: 50px; height: 50px; border-radius: 50%;
             background: rgba(0, 0, 0, 0.6); color: white; border: 1px solid rgba(255,255,255,0.1);
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.2rem; cursor: pointer; backdrop-filter: blur(5px);
-            transition: transform 0.2s;
+            font-size: 1.1rem; cursor: pointer; backdrop-filter: blur(5px);
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
         }
         .yt-btn:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
 
         .yt-play-big {
-            width: 80px; height: 80px; font-size: 2.5rem;
+            width: 70px; height: 70px; font-size: 2rem;
             background: rgba(0, 0, 0, 0.7);
-            border: 2px solid rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.2);
+        }
+
+        /* 💻 تحسينات للشاشات الكبيرة (Tablet & Laptop) 💻 */
+        @media (min-width: 768px) {
+            /* تكبير الزراير */
+            .yt-btn { width: 65px; height: 65px; font-size: 1.4rem; gap: 50px; }
+            .yt-play-big { width: 90px; height: 90px; font-size: 3rem; }
+            
+            /* تكبير العنوان */
+            .video-title { font-size: 1.3rem; max-width: 80%; }
+            .yt-header { padding: 30px; }
+
+            /* تأثيرات الماوس (Hover) للاب توب */
+            .yt-btn:hover { 
+                background: white; color: black; 
+                transform: scale(1.1); border-color: white; 
+            }
+            .yt-play-big:hover {
+                background: #ff0000; color: white; border-color: #ff0000;
+            }
         }
 
         /* العلامة المائية */
@@ -80,36 +115,34 @@
         }
         @keyframes floatText { from { transform: translateX(0); } to { transform: translateX(-30px); } }
 
-        /* كلاس الإخفاء */
         .hidden-ui { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <div class="video-wrapper" id="videoWrapper">
-        
         <div id="player-container" class="w-full h-full"></div>
 
         <div id="ytOverlay" class="yt-overlay">
             
             <div class="yt-header">
-                <button onclick="history.back()" class="text-white text-xl p-2 rounded-full hover:bg-white/10 transition"><i class="fas fa-arrow-right"></i></button>
-                <h1 class="text-white text-sm font-bold truncate max-w-[70%]" id="vidTitle">...</h1>
+                <button onclick="history.back()" class="header-btn"><i class="fas fa-arrow-right"></i></button>
+                <h1 class="video-title" id="vidTitle">...</h1>
             </div>
 
             <div class="center-controls">
-                <button id="btnRewind" class="yt-btn">
-                    <i class="fas fa-undo-alt text-sm"></i>
-                    <span class="absolute mt-6 text-[10px] font-bold">10</span>
+                <button id="btnRewind" class="yt-btn group">
+                    <i class="fas fa-undo-alt"></i>
+                    <span class="absolute mt-8 text-[10px] font-bold opacity-70 group-hover:opacity-100 group-hover:text-black">10</span>
                 </button>
 
                 <button id="btnPlayPause" class="yt-btn yt-play-big">
                     <i class="fas fa-play ml-1" id="iconPlay"></i>
                 </button>
 
-                <button id="btnForward" class="yt-btn">
-                    <i class="fas fa-redo-alt text-sm"></i>
-                    <span class="absolute mt-6 text-[10px] font-bold">10</span>
+                <button id="btnForward" class="yt-btn group">
+                    <i class="fas fa-redo-alt"></i>
+                    <span class="absolute mt-8 text-[10px] font-bold opacity-70 group-hover:opacity-100 group-hover:text-black">10</span>
                 </button>
             </div>
 
@@ -121,7 +154,6 @@
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // 1. التحقق
         const userCode = checkAuth();
         if(!userCode) window.location.href = 'index.html';
         document.getElementById('watermark').innerText = "ID: " + userCode;
@@ -130,7 +162,6 @@
         if(!videoData) { alert("خطأ"); history.back(); }
         document.getElementById('vidTitle').innerText = videoData.video_name || videoData.name || "مشاهدة الفيديو";
 
-        // 2. إعداد المشغل
         const container = document.getElementById('player-container');
         let src = videoData.stream_url || videoData.video_url || "";
         src = src.trim();
@@ -144,78 +175,81 @@
 
         const player = new Plyr('#player', {
             controls: ['progress', 'current-time', 'duration', 'settings', 'fullscreen'],
-            hideControls: false, // احنا هنتحكم في الإخفاء
-            clickToPlay: false, // لغينا اللمس للتشغيل عشان ميتعارضش
+            hideControls: false,
+            clickToPlay: false,
             fullscreen: { enabled: true, fallback: true, iosNative: 'auto' }
         });
 
-        // 3. منطق التحكم (السهل الممتنع)
         const overlay = document.getElementById('ytOverlay');
         const iconPlay = document.getElementById('iconPlay');
+        const wrapper = document.getElementById('videoWrapper');
         let uiTimer;
 
-        // دالة إظهار الواجهة
         function showUI() {
             overlay.classList.remove('hidden-ui');
             player.toggleControls(true);
-            
+            resetTimer();
+        }
+
+        function hideUI() {
+            if(player.paused) return;
+            overlay.classList.add('hidden-ui');
+            player.toggleControls(false);
+        }
+
+        function resetTimer() {
             clearTimeout(uiTimer);
-            // لو الفيديو شغال، نخفي الواجهة بعد 3 ثواني
             if(player.playing) {
                 uiTimer = setTimeout(hideUI, 3000);
             }
         }
 
-        // دالة إخفاء الواجهة
-        function hideUI() {
-            if(player.paused) return; // لو واقف متخفيش الواجهة
-            overlay.classList.add('hidden-ui');
-            player.toggleControls(false);
+        function toggleUI() {
+            if(overlay.classList.contains('hidden-ui')) showUI();
+            else hideUI();
         }
 
-        // 4. تشغيل الأزرار
+        // أزرار التحكم
         document.getElementById('btnPlayPause').addEventListener('click', (e) => {
-            e.stopPropagation(); // منع انتقال اللمس للخلفية
-            player.togglePlay();
+            e.stopPropagation(); player.togglePlay();
         });
-
         document.getElementById('btnForward').addEventListener('click', (e) => {
-            e.stopPropagation();
-            player.forward(10);
-            showUI(); // جدد وقت الظهور
+            e.stopPropagation(); player.forward(10); resetTimer();
+        });
+        document.getElementById('btnRewind').addEventListener('click', (e) => {
+            e.stopPropagation(); player.rewind(10); resetTimer();
         });
 
-        document.getElementById('btnRewind').addEventListener('click', (e) => {
-            e.stopPropagation();
-            player.rewind(10);
+        // مزامنة الحالة
+        player.on('play', () => {
+            iconPlay.className = 'fas fa-pause';
+            resetTimer();
+        });
+        player.on('pause', () => {
+            iconPlay.className = 'fas fa-play ml-1';
             showUI();
         });
 
-        // 5. ربط حالة المشغل بالأيقونات
-        player.on('play', () => {
-            iconPlay.className = 'fas fa-pause';
-            uiTimer = setTimeout(hideUI, 2500);
-        });
-
-        player.on('pause', () => {
-            iconPlay.className = 'fas fa-play ml-1';
-            showUI(); // أظهر الواجهة فوراً عند التوقف
-        });
-
-        // 6. لمسة واحدة على الشاشة تظهر/تخفي التحكم
-        // (ده الحل البديل عن الدبل تاب)
-        overlay.addEventListener('click', (e) => {
-            // لو الضغط تم على الخلفية الفاضية مش على زرار
-            if(e.target === overlay || e.target.classList.contains('center-controls')) {
-                if(overlay.classList.contains('hidden-ui')) showUI();
-                else hideUI();
+        // 🖱️ دعم الماوس (للاب توب والكمبيوتر) 🖱️
+        // أول ما الماوس يتحرك -> أظهر التحكم
+        wrapper.addEventListener('mousemove', () => {
+            if(overlay.classList.contains('hidden-ui')) {
+                showUI();
+            } else {
+                // لو الماوس بيتحرك كتير، جدد وقت الإخفاء
+                resetTimer();
             }
         });
 
-        // تشغيل أولي
-        showUI();
+        // لمس الشاشة (للموبايل والتابلت)
+        overlay.addEventListener('click', (e) => {
+            if(e.target === overlay || e.target.classList.contains('center-controls')) {
+                toggleUI();
+            }
+        });
 
+        showUI();
     </script>
 </body>
-    </html>
-    
+                    </html>
+                    
