@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الرئيسية | FULL MARK</title>
+    <title>المواد الدراسية | FULL MARK</title>
+    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="auth.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
@@ -21,74 +23,74 @@
             overflow-x: hidden;
         }
 
-        /* خلفية احترافية متحركة */
+        /* خلفية متحركة */
         .animated-bg {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background: 
-                radial-gradient(circle at 15% 50%, rgba(76, 29, 149, 0.4), transparent 25%), 
-                radial-gradient(circle at 85% 30%, rgba(124, 58, 237, 0.2), transparent 25%);
-            background-color: #030712;
+            background: radial-gradient(circle at 50% 10%, #1e1b4b, #000000 80%);
         }
 
-        /* الهيدر الزجاجي */
+        /* الهيدر */
         .glass-header {
-            background: rgba(17, 24, 39, 0.6);
-            backdrop-filter: blur(16px);
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             position: sticky; top: 0; z-index: 50;
         }
 
-        /* كارت المادة */
+        /* كارت المادة الجديد */
         .subject-card {
-            position: relative;
-            background: rgba(30, 41, 59, 0.3);
+            background: rgba(30, 41, 59, 0.4);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 24px;
-            padding: 24px;
-            overflow: hidden;
+            padding: 20px;
+            display: flex; flex-direction: column; align-items: center; text-align: center;
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
         }
 
         .subject-card:hover {
-            transform: translateY(-8px);
-            background: rgba(30, 41, 59, 0.6);
-            border-color: rgba(139, 92, 246, 0.5);
-            box-shadow: 0 20px 40px -12px rgba(124, 58, 237, 0.3);
+            transform: translateY(-10px);
+            background: rgba(30, 41, 59, 0.7);
+            border-color: #6366f1;
+            box-shadow: 0 20px 40px -15px rgba(99, 102, 241, 0.3);
         }
 
-        /* تأثير اللمعان */
-        .subject-card::before {
-            content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-            transform: skewX(-25deg); transition: 0.5s;
-        }
-        .subject-card:hover::before { left: 150%; }
-
-        /* الأيقونة */
-        .icon-box {
-            width: 70px; height: 70px;
-            background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-            border-radius: 20px;
-            display: flex; align-items: center; justify-content: center;
-            margin-bottom: 16px;
-            border: 1px solid rgba(255,255,255,0.1);
-            transition: 0.4s;
-        }
-        .subject-card:hover .icon-box {
-            background: linear-gradient(135deg, #6d28d9, #4c1d95);
-            border-color: transparent;
-            transform: scale(1.1) rotate(5deg);
+        /* حاوية الصورة الواقعية */
+        .image-container {
+            width: 100%;
+            height: 140px;
+            border-radius: 18px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
         }
 
-        .img-icon { width: 40px; height: 40px; object-fit: contain; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
-
-        .loading-shimmer {
-            background: linear-gradient(90deg, #1f2937 25%, #374151 50%, #1f2937 75%);
-            background-size: 200% 100%;
-            animation: shimmer 1.5s infinite;
+        .real-img {
+            width: 100%; height: 100%;
+            object-fit: cover;
+            transition: 0.5s;
+            filter: brightness(0.8);
         }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        
+        .subject-card:hover .real-img {
+            transform: scale(1.1);
+            filter: brightness(1);
+        }
+
+        .teacher-count {
+            position: absolute; bottom: 8px; right: 8px;
+            background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(4px);
+            padding: 4px 10px; border-radius: 8px;
+            font-size: 0.7rem; font-weight: bold; color: #fbbf24;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* تأثير التحميل */
+        .skeleton { background: rgba(255,255,255,0.05); animation: pulse 1.5s infinite; border-radius: 24px; }
+        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
     </style>
 </head>
 <body>
@@ -98,65 +100,53 @@
     <div id="app">
         
         <header class="glass-header px-6 py-4 flex justify-between items-center">
-            <div @click="goToProfile" class="flex items-center gap-3 cursor-pointer group hover:opacity-80 transition">
+            <div @click="goToProfile" class="flex items-center gap-3 cursor-pointer group">
                 <div class="relative">
                     <div class="w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-indigo-500 to-fuchsia-500">
                         <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg" 
-                             class="w-full h-full rounded-full object-cover bg-slate-900 border-2 border-slate-900">
+                             class="w-full h-full rounded-full object-cover bg-slate-900">
                     </div>
                     <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full animate-pulse"></div>
                 </div>
                 <div>
-                    <p class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">أهلاً يا بطل 👋</p>
+                    <p class="text-[10px] text-indigo-400 font-bold uppercase">أهلاً بك 👋</p>
                     <h2 class="font-bold text-lg leading-tight group-hover:text-indigo-300 transition">{{ studentName }}</h2>
                 </div>
             </div>
 
-            <div>
-                <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 hover:bg-red-500 hover:text-white transition shadow-lg">
-                    <i class="fas fa-power-off text-sm"></i>
-                </button>
-            </div>
+            <button onclick="logout()" class="w-10 h-10 rounded-xl bg-red-500/10 text-red-400 flex items-center justify-center border border-red-500/20 hover:bg-red-500 hover:text-white transition shadow-lg">
+                <i class="fas fa-power-off text-sm"></i>
+            </button>
         </header>
 
         <main class="px-6 py-8 max-w-6xl mx-auto">
             
-            <div class="mb-10 text-center md:text-right">
-                <h1 class="text-3xl md:text-4xl font-black mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent font-['Outfit']">
-                    Study Smart, Not Hard 🚀
-                </h1>
-                <p class="text-gray-400 text-sm font-medium">كل المواد اللي محتاجها عشان تقفل الدرجة النهائية</p>
+            <div class="mb-8">
+                <h1 class="text-2xl font-black mb-1">المواد الدراسية</h1>
+                <p class="text-gray-400 text-sm">اختر المادة للوصول للمحتوى</p>
             </div>
 
             <div v-if="loading" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
-                <div v-for="n in 4" class="h-56 rounded-3xl loading-shimmer border border-white/5"></div>
+                <div v-for="n in 4" class="h-64 skeleton"></div>
             </div>
 
             <div v-else class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
                 <div v-for="s in subjects" :key="s.id" @click="openSubject(s)" class="subject-card group">
-                    <div class="flex justify-between items-start">
-                        <div class="icon-box">
-                            <img :src="getImage(s.name)" class="img-icon">
+                    
+                    <div class="image-container">
+                        <img :src="getImage(s.name)" class="real-img" loading="lazy">
+                        <div class="teacher-count">
+                            <i class="fas fa-user-tie ml-1"></i> {{ s.teachers ? s.teachers.length : 0 }}
                         </div>
-                        <span class="text-[10px] bg-white/5 px-2 py-1 rounded-lg text-gray-400 font-bold border border-white/5">
-                            {{ s.teachers ? s.teachers.length : 0 }} مدرس
-                        </span>
                     </div>
                     
-                    <h3 class="text-xl font-bold mb-1 group-hover:text-indigo-400 transition">{{ s.name }}</h3>
-                    <p class="text-xs text-gray-500">اضغط للدخول</p>
-                    
-                    <div class="absolute bottom-4 left-4 opacity-0 transform translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition duration-300">
-                        <i class="fas fa-arrow-left text-indigo-400"></i>
-                    </div>
+                    <h3 class="text-lg font-bold group-hover:text-indigo-400 transition">{{ s.name }}</h3>
+                    <p class="text-xs text-gray-500 mt-1">اضغط للدخول</p>
                 </div>
             </div>
 
             <div v-if="!loading && subjects.length === 0" class="text-center py-20">
-                <div class="inline-block p-6 rounded-full bg-slate-800/50 mb-4">
-                    <i class="fas fa-search text-3xl text-gray-600"></i>
-                </div>
-                <p class="text-gray-500">جاري إضافة المواد قريباً...</p>
+                <p class="text-gray-500">لا توجد مواد متاحة حالياً</p>
             </div>
 
         </main>
@@ -168,33 +158,32 @@
         createApp({
             setup() {
                 const subjects = ref([]);
-                const studentName = ref('جاري التحميل...');
+                const studentName = ref('...');
                 const loading = ref(true);
                 const yid = ref(null);
 
-                // الانتقال لصفحة البروفايل
                 const goToProfile = () => {
                     window.location.href = 'profile.html';
                 };
 
-                // الانتقال للمدرسين
                 const openSubject = (s) => {
                     window.location.href = `teachers.html?yid=${yid.value}&sid=${s.id}`;
                 };
 
-                // أيقونات المواد
+                // دالة الصور الواقعية (Unsplash)
                 const getImage = (name) => {
                     const n = name.toLowerCase();
-                    if(n.includes('english') || n.includes('إنجليزي')) return 'https://cdn-icons-png.flaticon.com/512/3269/3269817.png';
-                    if(n.includes('arabic') || n.includes('عربي')) return 'https://cdn-icons-png.flaticon.com/512/3389/3389081.png';
-                    if(n.includes('physics') || n.includes('فيزياء')) return 'https://cdn-icons-png.flaticon.com/512/3081/3081530.png';
-                    if(n.includes('chemistry') || n.includes('كيمياء')) return 'https://cdn-icons-png.flaticon.com/512/1233/1233262.png';
-                    if(n.includes('math') || n.includes('رياضيات')) return 'https://cdn-icons-png.flaticon.com/512/4091/4091410.png';
-                    if(n.includes('bio') || n.includes('أحياء')) return 'https://cdn-icons-png.flaticon.com/512/2990/2990212.png';
-                    if(n.includes('history') || n.includes('تاريخ')) return 'https://cdn-icons-png.flaticon.com/512/2234/2234665.png';
-                    if(n.includes('geo') || n.includes('جغرافيا')) return 'https://cdn-icons-png.flaticon.com/512/2947/2947656.png';
-                    if(n.includes('french') || n.includes('فرنساوي')) return 'https://cdn-icons-png.flaticon.com/512/330/330490.png';
-                    return 'https://cdn-icons-png.flaticon.com/512/2232/2232688.png';
+                    if(n.includes('physics') || n.includes('فيزياء')) return 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('chemistry') || n.includes('كيمياء')) return 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('bio') || n.includes('أحياء')) return 'https://images.unsplash.com/photo-1576086213369-97a306d36557?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('history') || n.includes('تاريخ')) return 'https://images.unsplash.com/photo-1568684333877-4d39f2c871c9?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('geo') || n.includes('جغرافيا')) return 'https://images.unsplash.com/photo-1524661135-423995f22d0b?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('english') || n.includes('إنجليزي')) return 'https://images.unsplash.com/photo-1526304640152-d4619684e484?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('arabic') || n.includes('عربي')) return 'https://images.unsplash.com/photo-1589829085413-56de8ae18c73?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('math') || n.includes('رياضيات')) return 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?q=80&w=400&auto=format&fit=crop';
+                    if(n.includes('french') || n.includes('فرنساوي')) return 'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?q=80&w=400&auto=format&fit=crop';
+                    
+                    return 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=400&auto=format&fit=crop'; // Default
                 };
 
                 onMounted(async () => {
@@ -227,6 +216,13 @@
                 return { subjects, studentName, loading, getImage, openSubject, goToProfile };
             }
         }).mount('#app');
+
+        function logout() {
+            if(confirm('هل أنت متأكد من تسجيل الخروج؟')) {
+                localStorage.removeItem('alpha_user_code');
+                window.location.replace('index.html');
+            }
+        }
     </script>
 </body>
 </html>
