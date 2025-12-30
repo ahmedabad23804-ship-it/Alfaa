@@ -18,6 +18,7 @@
         .status-badge { padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: bold; }
         .bg-blocked { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
         .bg-active { background: rgba(34, 197, 94, 0.15); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+        .bg-expired { background: rgba(156, 163, 175, 0.15); color: #9ca3af; border: 1px solid rgba(156, 163, 175, 0.3); }
         input, select { background: rgba(15, 23, 42, 0.8) !important; border: 1px solid rgba(99, 102, 241, 0.3) !important; color: white !important; transition: 0.3s; }
         input:focus { border-color: #6366f1 !important; box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2); }
         table { border-spacing: 0 10px; border-collapse: separate; }
@@ -134,7 +135,7 @@
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="w-full text-right">
+                    <table class="w-full text-right" id="mainTable">
                         <thead>
                             <tr class="bg-transparent text-gray-400 text-xs">
                                 <th class="p-4 font-normal text-right">معلومات الطالب</th>
@@ -144,8 +145,7 @@
                                 <th class="p-4 font-normal text-center">الإجراءات</th>
                             </tr>
                         </thead>
-                        <tbody id="codesTable">
-                            </tbody>
+                        <tbody id="codesTable"></tbody>
                     </table>
                 </div>
             </div>
@@ -172,28 +172,32 @@
         }
 
         async function createCode() {
-            const name = document.getElementById('stdName').value;
+            const name = document.getElementById('stdName').value.trim();
             const code = document.getElementById('stdCode').value;
             const section = document.getElementById('stdSection').value;
             const days = parseInt(document.getElementById('subType').value);
 
-            if(!name) return alert("يرجى كتابة اسم الطالب");
+            if(!name) return alert("⚠️ يرجى كتابة اسم الطالب");
 
             const expiryDate = new Date();
             expiryDate.setDate(expiryDate.getDate() + days);
 
-            await db.ref('approvedStudents/' + code).set({
-                studentName: name,
-                section: section,
-                expiryDate: expiryDate.getTime(),
-                isBlocked: false,
-                deviceId: null,
-                createdAt: new Date().getTime()
-            });
+            try {
+                await db.ref('approvedStudents/' + code).set({
+                    studentName: name,
+                    section: section,
+                    expiryDate: expiryDate.getTime(),
+                    isBlocked: false,
+                    deviceId: null,
+                    createdAt: new Date().getTime()
+                });
 
-            alert("✅ تم إنشاء الكود بنجاح للطالب: " + name);
-            document.getElementById('stdName').value = '';
-            showPage('list');
+                alert("✅ تم إنشاء الكود بنجاح للطالب: " + name);
+                document.getElementById('stdName').value = '';
+                showPage('list');
+            } catch (error) {
+                alert("❌ حدث خطأ أثناء الحفظ");
+            }
         }
 
         function loadData() {
@@ -203,41 +207,58 @@
                 let total = 0, active = 0, blocked = 0;
                 const now = new Date().getTime();
 
-                for(let id in data) {
-                    const s = data[id];
-                    total++;
-                    if(s.isBlocked) blocked++; else active++;
+                if (data) {
+                    for(let id in data) {
+                        const s = data[id];
+                        total++;
+                        
+                        const timeLeft = Math.ceil((s.expiryDate - now) / (1000 * 60 * 60 * 24));
+                        const isExpired = timeLeft <= 0;
+                        
+                        if(s.isBlocked) blocked++; 
+                        else if (!isExpired) active++;
 
-                    const timeLeft = Math.ceil((s.expiryDate - now) / (1000 * 60 * 60 * 24));
-                    const statusText = timeLeft > 0 ? (s.isBlocked ? 'محظور' : 'نشط') : 'منتهي';
-                    const statusClass = (timeLeft > 0 && !s.isBlocked) ? 'bg-active' : 'bg-blocked';
+                        let statusText = 'نشط';
+                        let statusClass = 'bg-active';
 
-                    html += `
-                        <tr class="rounded-2xl border-b border-white/5">
-                            <td class="p-4">
-                                <div class="font-bold">${s.studentName}</div>
-                                <div class="text-[10px] text-indigo-400 uppercase font-semibold">${s.section}</div>
-                            </td>
-                            <td class="p-4 text-center font-mono text-fuchsia-400 font-bold">${id}</td>
-                            <td class="p-4 text-center text-xs">
-                                <div class="${timeLeft <= 2 ? 'text-red-400 font-bold animate-pulse' : 'text-gray-300'}">
-                                    ${new Date(s.expiryDate).toLocaleDateString('ar-EG')}
-                                </div>
-                                <div class="text-[10px] text-gray-500">متبقي ${timeLeft} يوم</div>
-                            </td>
-                            <td class="p-4 text-center"><span class="status-badge ${statusClass}">${statusText}</span></td>
-                            <td class="p-4">
-                                <div class="flex justify-center gap-3">
-                                    <button onclick="renew('${id}')" class="text-green-500 hover:text-green-300 transition" title="تجديد 30 يوم"><i class="fas fa-plus-circle"></i></button>
-                                    <button onclick="toggleBlock('${id}', ${s.isBlocked})" class="${s.isBlocked ? 'text-blue-500' : 'text-orange-500'} hover:scale-110 transition" title="حظر/إلغاء">
-                                        <i class="fas ${s.isBlocked ? 'fa-unlock' : 'fa-user-slash'}"></i>
-                                    </button>
-                                    <button onclick="deleteCode('${id}')" class="text-red-500 hover:text-red-300 transition" title="حذف"><i class="fas fa-trash-alt"></i></button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
+                        if (isExpired) {
+                            statusText = 'منتهي';
+                            statusClass = 'bg-expired';
+                        } else if (s.isBlocked) {
+                            statusText = 'محظور';
+                            statusClass = 'bg-blocked';
+                        }
+
+                        html += `
+                            <tr class="rounded-2xl border-b border-white/5">
+                                <td class="p-4">
+                                    <div class="font-bold">${s.studentName}</div>
+                                    <div class="text-[10px] text-indigo-400 uppercase font-semibold">${s.section}</div>
+                                </td>
+                                <td class="p-4 text-center font-mono text-fuchsia-400 font-bold">${id}</td>
+                                <td class="p-4 text-center text-xs">
+                                    <div class="${(timeLeft <= 2 && timeLeft > 0) ? 'text-red-400 font-bold animate-pulse' : 'text-gray-300'}">
+                                        ${new Date(s.expiryDate).toLocaleDateString('ar-EG')}
+                                    </div>
+                                    <div class="text-[10px] text-gray-500">
+                                        ${isExpired ? 'انتهت الصلاحية' : `متبقي ${timeLeft} يوم`}
+                                    </div>
+                                </td>
+                                <td class="p-4 text-center"><span class="status-badge ${statusClass}">${statusText}</span></td>
+                                <td class="p-4">
+                                    <div class="flex justify-center gap-3">
+                                        <button onclick="renew('${id}')" class="text-green-500 hover:text-green-300 transition" title="تجديد 30 يوم"><i class="fas fa-plus-circle"></i></button>
+                                        <button onclick="toggleBlock('${id}', ${s.isBlocked})" class="${s.isBlocked ? 'text-blue-500' : 'text-orange-500'} hover:scale-110 transition" title="حظر/إلغاء">
+                                            <i class="fas ${s.isBlocked ? 'fa-unlock' : 'fa-user-slash'}"></i>
+                                        </button>
+                                        <button onclick="deleteCode('${id}')" class="text-red-500 hover:text-red-300 transition" title="حذف"><i class="fas fa-trash-alt"></i></button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }
                 }
+
                 document.getElementById('codesTable').innerHTML = html || '<tr><td colspan="5" class="text-center p-10 text-gray-500">لا يوجد بيانات لعرضها</td></tr>';
                 document.getElementById('total-std').innerText = total;
                 document.getElementById('active-std').innerText = active;
@@ -248,22 +269,30 @@
         function renew(id) {
             if(confirm('هل أنت متأكد من تمديد الاشتراك 30 يوم إضافي؟')) {
                 db.ref('approvedStudents/'+id).once('value', snap => {
-                    let currentExpiry = snap.val().expiryDate;
-                    let newExpiry = (currentExpiry > new Date().getTime()) ? new Date(currentExpiry) : new Date();
+                    const currentData = snap.val();
+                    let currentExpiry = currentData.expiryDate;
+                    // إذا كان الكود منتهياً، ابدأ التجديد من اليوم، وإذا كان سارياً أضف للأيام المتبقية
+                    let baseDate = (currentExpiry > new Date().getTime()) ? currentExpiry : new Date().getTime();
+                    let newExpiry = new Date(baseDate);
                     newExpiry.setDate(newExpiry.getDate() + 30);
-                    db.ref('approvedStudents/'+id).update({ expiryDate: newExpiry.getTime(), isBlocked: false });
+                    
+                    db.ref('approvedStudents/'+id).update({ 
+                        expiryDate: newExpiry.getTime(), 
+                        isBlocked: false 
+                    });
                 });
             }
         }
 
         function toggleBlock(id, currentStatus) {
-            if(confirm(currentStatus ? 'إلغاء الحظر؟' : 'هل تريد حظر هذا الكود؟')) {
+            const msg = currentStatus ? 'هل تريد إلغاء الحظر عن هذا الطالب؟' : 'هل تريد حظر هذا الكود؟ لن يتمكن الطالب من الدخول.';
+            if(confirm(msg)) {
                 db.ref('approvedStudents/'+id).update({ isBlocked: !currentStatus });
             }
         }
 
         function deleteCode(id) {
-            if(confirm('حذف نهائي؟ لا يمكن التراجع عن هذه الخطوة.')) {
+            if(confirm('⚠️ حذف نهائي؟ سيتم مسح بيانات الطالب تماماً ولا يمكن التراجع.')) {
                 db.ref('approvedStudents/'+id).remove();
             }
         }
@@ -272,11 +301,15 @@
             let val = document.getElementById('searchInp').value.toLowerCase();
             let rows = document.getElementById('codesTable').getElementsByTagName('tr');
             for(let r of rows) {
-                if(r.innerText) r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none';
+                if(r.innerText) {
+                    r.style.display = r.innerText.toLowerCase().includes(val) ? '' : 'none';
+                }
             }
         }
 
-        loadData();
+        // تشغيل التحميل عند فتح الصفحة
+        window.onload = loadData;
     </script>
 </body>
-  </html>
+    </html>
+    
