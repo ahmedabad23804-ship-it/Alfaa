@@ -27,21 +27,18 @@
             --plyr-menu-color: #f8fafc;
         }
 
-        /* ✅ إصلاح زرار التكبير والتصغير */
-        /* 1. رفع شريط التحكم فوق كل الطبقات */
+        /* 1. إصلاح أزرار التحكم */
         .plyr__controls {
-            z-index: 1000 !important; /* رقم عالي جداً عشان يضمن الظهور */
-            position: relative;
+            z-index: 1000 !important; /* يضمن إن الزراير فوق أي طبقة تانية */
+            padding-bottom: 20px !important; /* يرفع الزراير شوية لفوق */
         }
         
-        /* 2. إجبار زر التكبير على الظهور */
-        button[data-plyr="fullscreen"] {
-            display: inline-block !important;
-        }
+        /* إجبار زر التكبير على الظهور */
+        button[data-plyr="fullscreen"] { display: inline-block !important; }
 
         /* زر الرجوع */
         .back-btn {
-            position: absolute; top: 20px; right: 20px; z-index: 1100; /* أعلى من الفيديو */
+            position: absolute; top: 20px; right: 20px; z-index: 1100;
             width: 45px; height: 45px; border-radius: 15px;
             background: rgba(15, 23, 42, 0.6); color: white;
             display: flex; align-items: center; justify-content: center;
@@ -60,11 +57,14 @@
             100% { top: 90%; left: 90%; transform: rotate(-5deg); }
         }
 
-        /* مناطق اللمس المزدوج */
+        /* ✅ التعديل الجوهري: مناطق اللمس "العائمة" */
+        /* المناطق دي دلوقتي في نص الشاشة بالظبط ومش واصلة لتحت عند الزراير */
         .dt-zone {
-            position: absolute; top: 0; 
-            bottom: 100px; /* ✅ رفعناها 100 بيكسل عشان نبعد عن شريط التحكم تماماً */
-            width: 35%; z-index: 50;
+            position: absolute;
+            top: 50%; transform: translateY(-50%); /* سنتر عمودي */
+            height: 50%; /* تاخد 50% بس من طول الشاشة عشان نسيب مساحة فوق وتحت */
+            width: 35%; 
+            z-index: 50;
             display: flex; align-items: center; justify-content: center;
             opacity: 0; transition: 0.2s; pointer-events: auto;
         }
@@ -107,7 +107,6 @@
             alert("خطأ في الفيديو"); history.back();
         } else {
             let src = videoData.stream_url || videoData.video_url || "";
-            // تنظيف الرابط
             src = src.trim();
 
             if(src.includes('youtube') || src.includes('youtu.be')) {
@@ -117,32 +116,24 @@
                 container.innerHTML = `<video id="player" playsinline controls><source src="${src}" type="video/mp4" /></video>`;
             }
 
-            // إعدادات المشغل
             const player = new Plyr('#player', {
-                // ✅ ترتيب الأزرار وإضافة زر التكبير fullscreen
                 controls: [
-                    'play-large', // زر التشغيل الكبير في النص
-                    'play', // زر التشغيل الصغير تحت
-                    'progress', // شريط الوقت
-                    'current-time', // الوقت الحالي
-                    'duration', // الوقت الكلي
-                    'mute', // كتم الصوت
-                    'volume', // مستوى الصوت
-                    'settings', // الإعدادات (الجودة والسرعة)
-                    'fullscreen' // ✅ زر التكبير والتصغير
+                    'play-large', 'play', 'progress', 'current-time', 'duration', 
+                    'mute', 'volume', 'settings', 'fullscreen'
                 ],
                 settings: ['quality', 'speed'],
                 speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
                 fullscreen: { enabled: true, fallback: true, iosNative: false },
-                clickToPlay: true
+                clickToPlay: true,
+                hideControls: true // إخفاء التحكم تلقائياً لما تشيل الماوس
             });
 
-            // منع التكبير باللمس المزدوج على الشاشة
+            // منع التكبير باللمس المزدوج
             document.querySelector('.video-wrapper').addEventListener('dblclick', (e) => {
                 e.preventDefault(); e.stopPropagation();
             }, true);
 
-            // تشغيل التقديم والترجيع
+            // لوجيك اللمس المزدوج
             const tapLeft = document.getElementById('tapLeft');
             const tapRight = document.getElementById('tapRight');
             let lastTapTime = 0;
