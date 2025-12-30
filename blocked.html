@@ -8,62 +8,93 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #020617; color: white; height: 100vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        body { 
+            font-family: 'Cairo', sans-serif; 
+            background: #020617; 
+            color: white; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            background-image: radial-gradient(circle at center, #1e1b4b 0%, #000 100%);
+        }
+
         .blocked-card {
-            background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(20px);
-            border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 30px;
-            padding: 40px; text-align: center; max-width: 400px; width: 90%;
-            box-shadow: 0 0 50px rgba(239, 68, 68, 0.15);
-            animation: shake 0.5s ease-in-out;
+            background: rgba(30, 41, 59, 0.4); 
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(239, 68, 68, 0.3); 
+            border-radius: 30px;
+            padding: 50px 30px; 
+            text-align: center; 
+            max-width: 400px; 
+            width: 90%;
+            box-shadow: 0 0 80px rgba(220, 38, 38, 0.15);
+            animation: bounceIn 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            position: relative;
+            overflow: hidden;
         }
-        .icon-box {
-            width: 80px; height: 80px; background: rgba(239, 68, 68, 0.1);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            margin: 0 auto 20px; color: #ef4444; font-size: 2.5rem;
-            border: 2px solid rgba(239, 68, 68, 0.2);
+
+        /* خط أحمر متحرك */
+        .blocked-card::before {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: linear-gradient(90deg, #ef4444, #f87171, #ef4444);
+            animation: shimmer 2s infinite;
         }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
+
+        .emoji-box {
+            font-size: 5rem; 
+            margin-bottom: 20px;
+            animation: shake 2s infinite;
+            display: inline-block;
         }
+
+        @keyframes bounceIn { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        @keyframes shake { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-10deg); } 75% { transform: rotate(10deg); } }
     </style>
 </head>
 <body>
 
     <div class="blocked-card">
-        <div class="icon-box">
-            <i class="fas fa-user-lock"></i>
-        </div>
+        <div class="emoji-box">🍆</div>
         
-        <h1 class="text-2xl font-black text-red-500 mb-2">عفواً، تم حظرك!</h1>
-        <p class="text-gray-300 text-sm mb-6">
-            أهلاً <span id="stdName" class="text-white font-bold">...</span><br>
-            لقد قامت الإدارة بتعليق حسابك مؤقتاً. لا يمكنك الدخول للمنصة حالياً.
+        <h1 class="text-3xl font-black text-red-500 mb-2">تم حظرك يا بتنجانة!</h1>
+        
+        <p class="text-gray-300 text-sm mb-8 leading-relaxed">
+            أهلاً يا <span id="stdName" class="text-white font-bold text-lg">...</span><br>
+            شكلك عملت حاجة غلط والإدارة قفلت حسابك.<br>
+            <span class="text-xs text-gray-500 mt-2 block">عايز ترجع؟ كلم الأدمن يتصرف معاك.</span>
         </p>
 
-        <div class="space-y-3">
-            <a href="https://t.me/YOUR_TELEGRAM_LINK" target="_blank" class="block w-full py-3 bg-blue-600 hover:bg-blue-500 rounded-xl font-bold transition flex items-center justify-center gap-2">
-                <i class="fab fa-telegram-plane"></i> تواصل مع الدعم لفك الحظر
+        <div class="space-y-4">
+            <a href="https://t.me/giza_full_mark" target="_blank" class="block w-full py-3.5 bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 rounded-2xl font-bold shadow-lg shadow-blue-500/20 transition transform hover:-translate-y-1 active:scale-95 flex items-center justify-center gap-2">
+                <i class="fab fa-telegram-plane text-xl"></i> تواصل مع الأدمن
             </a>
             
-            <button onclick="logout()" class="block w-full py-3 bg-white/5 hover:bg-white/10 text-gray-400 rounded-xl font-bold transition">
-                تسجيل خروج
+            <button onclick="logout()" class="block w-full py-3.5 bg-white/5 hover:bg-white/10 text-gray-400 border border-white/5 rounded-2xl font-bold transition">
+                <i class="fas fa-sign-out-alt"></i> تسجيل خروج
             </button>
         </div>
         
-        <p class="text-[10px] text-gray-600 mt-6">FULL MARK SYSTEM SECURITY</p>
+        <div class="mt-8 text-[10px] text-gray-600 font-mono tracking-widest uppercase">
+            System Locked • ID: <span id="codeDisplay">---</span>
+        </div>
     </div>
 
     <script>
-        // جلب الاسم من الذاكرة لعرضه
-        const name = localStorage.getItem('studentName') || "طالب";
+        // عرض اسم الطالب والكود
+        const name = localStorage.getItem('studentName') || "مجهول";
+        const code = localStorage.getItem('alpha_user_code') || "---";
+        
         document.getElementById('stdName').innerText = name;
+        document.getElementById('codeDisplay').innerText = code;
 
         function logout() {
-            localStorage.removeItem('alpha_user_code');
-            localStorage.removeItem('studentName');
-            window.location.href = 'index.html';
+            if(confirm("خلاص ماشي؟ هتمشي؟")) {
+                localStorage.clear(); // مسح كل حاجة
+                window.location.href = 'index.html';
+            }
         }
     </script>
 </body>
