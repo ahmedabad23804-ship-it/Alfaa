@@ -5,47 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تسجيل الدخول | FULL MARK</title>
     
-    <meta name="description" content="منصة Full Mark التعليمية - مسارك للتفوق.">
-    <meta name="keywords" content="Full Mark, Elgizawy, تعليم, ثانوية عامة, منصة">
-    <meta name="author" content="Elgizawy">
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
 
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
-
     <style>
-        /* 🎨 تعريف ألوان منصة FULL MARK */
+        /* 🎨 ثيم منصة FULL MARK */
         :root {
-            --primary-blue: #3b82f6;      /* الأزرق الأساسي */
-            --primary-glow: #60a5fa;      /* توهج أزرق */
-            --accent-gold: #fbbf24;       /* الذهبي (التاج والنجوم) */
-            --bg-dark: #020617;           /* الخلفية الداكنة */
-            --glass-bg: rgba(30, 41, 59, 0.6); /* خلفية الكارت الزجاجي */
-            --glass-border: rgba(99, 102, 241, 0.3); /* حدود الكارت */
+            --primary-blue: #3b82f6;
+            --accent-gold: #fbbf24;
+            --bg-dark: #020617;
+            --glass-bg: rgba(30, 41, 59, 0.6);
             --error-red: #ef4444;
             --success-green: #10b981;
         }
 
-        * {
-            margin: 0; padding: 0; box-sizing: border-box;
-            font-family: 'Tajawal', sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
 
         body {
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             min-height: 100vh;
-            /* خلفية متدرجة (فضائية) */
             background: radial-gradient(circle at 50% 0%, #1e1b4b, #020617 90%);
-            overflow: hidden; color: white;
-            padding: 20px;
+            overflow: hidden; color: white; padding: 20px;
         }
 
-        /* 🌌 تأثير النجوم الخلفية */
-        .stars-bg {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none;
-        }
+        /* 🌌 النجوم والشهب */
+        .stars-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
         .star {
             position: absolute; width: 2px; height: 2px; background: white; border-radius: 50%;
             box-shadow: 0 0 4px rgba(255,255,255,0.8);
@@ -53,120 +40,80 @@
         }
         @keyframes twinkle { 0%, 100% { opacity: 0; transform: scale(0.5); } 50% { opacity: 1; transform: scale(1); } }
 
-        /* 🌠 تأثير الشهب */
-        .shooting-star {
-            position: absolute; width: 4px; height: 4px; background: #fff; border-radius: 50%;
-            box-shadow: 0 0 10px 1px #fff, 0 0 20px 2px var(--primary-blue);
-            opacity: 0; transform: rotateZ(315deg); animation: shoot 6s linear infinite; z-index: -1;
-        }
-        @keyframes shoot {
-            0% { opacity: 0; transform: translate3d(0, 0, 0) rotateZ(315deg); }
-            10% { opacity: 1; }
-            100% { opacity: 0; transform: translate3d(500px, 500px, 0) rotateZ(315deg); }
-        }
-
-        /* 💳 كارت تسجيل الدخول */
+        /* 💳 كارت الدخول */
         .login-card {
             background: var(--glass-bg);
-            border: 1px solid var(--glass-border);
-            border-radius: 24px;
-            padding: 40px;
-            width: 100%; max-width: 400px;
-            text-align: center;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 24px; padding: 40px;
+            width: 100%; max-width: 420px; text-align: center;
             backdrop-filter: blur(20px);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            animation: floatUp 0.8s ease-out;
             position: relative; overflow: hidden;
+            animation: floatUp 0.8s ease-out;
         }
+        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* خط علوي ملون للكارت */
+        /* خط علوي ملون */
         .login-card::before {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 3px;
             background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold), var(--primary-blue));
         }
 
-        @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* 👑 العناوين */
         h2 {
-            font-family: 'Cairo', sans-serif;
-            margin-bottom: 10px; font-size: 2rem; font-weight: 900;
-            background: linear-gradient(to right, #fff, var(--primary-glow));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            font-family: 'Cairo', sans-serif; margin-bottom: 5px; font-size: 2rem; font-weight: 900;
+            background: linear-gradient(to right, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 30px; font-weight: bold; }
+        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px; font-weight: bold; }
 
-        /* ⌨️ حقول الإدخال */
+        /* ⌨️ المدخلات */
         .input-group { position: relative; margin-bottom: 20px; }
         .input-group input {
-            width: 100%; padding: 16px 50px 16px 20px;
+            width: 100%; padding: 15px 50px 15px 20px;
             background: rgba(15, 23, 42, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            color: white; font-size: 1.1rem; letter-spacing: 2px;
+            border-radius: 15px; color: white; font-size: 1.1rem;
             text-align: center; outline: none; transition: 0.3s;
-            font-family: monospace; font-weight: bold;
+            font-family: monospace; font-weight: bold; letter-spacing: 2px;
         }
-        .input-group input:focus {
-            border-color: var(--primary-blue);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
-            background: rgba(15, 23, 42, 0.9);
-        }
-        .input-group .icon {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            color: var(--primary-blue); font-size: 1.2rem;
-        }
+        .input-group input:focus { border-color: var(--primary-blue); background: rgba(15, 23, 42, 0.9); }
+        .input-group .icon { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--primary-blue); }
 
-        /* 🚀 زر الدخول */
         .login-btn {
-            width: 100%; padding: 16px; border: none; border-radius: 16px;
+            width: 100%; padding: 15px; border: none; border-radius: 15px;
             background: linear-gradient(135deg, var(--primary-blue), #4f46e5);
-            color: white; font-size: 1.1rem; font-weight: 800;
-            cursor: pointer; transition: 0.3s;
-            box-shadow: 0 10px 20px -10px rgba(59, 130, 246, 0.5);
+            color: white; font-size: 1.1rem; font-weight: 800; cursor: pointer; transition: 0.3s;
         }
-        .login-btn:hover {
-            transform: translateY(-3px); box-shadow: 0 15px 30px -10px rgba(79, 70, 229, 0.6);
-        }
-        .login-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5); }
+        .login-btn:disabled { opacity: 0.7; cursor: wait; }
 
-        /* 🔔 رسائل الحالة */
-        #statusMessage {
-            margin-bottom: 20px; padding: 12px; border-radius: 12px;
-            font-size: 0.9rem; font-weight: bold; display: none;
+        /* ⏱️ قسم العد التنازلي (الدخول التلقائي) */
+        #autoLoginSection { display: none; }
+        .countdown-circle {
+            width: 80px; height: 80px; margin: 0 auto 20px;
+            border-radius: 50%; border: 4px solid var(--accent-gold);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2.5rem; font-weight: 900; color: var(--accent-gold);
+            box-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
+            animation: pulse 1s infinite;
         }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .welcome-text { color: #fff; font-size: 1.2rem; margin-bottom: 5px; font-weight: bold; }
+        .code-badge { 
+            background: rgba(251, 191, 36, 0.1); color: var(--accent-gold); 
+            padding: 5px 15px; border-radius: 20px; font-family: monospace; 
+            border: 1px solid rgba(251, 191, 36, 0.3); display: inline-block; margin-bottom: 20px;
+        }
+        
+        .cancel-btn {
+            background: rgba(239, 68, 68, 0.15); color: #fca5a5;
+            padding: 10px 20px; border-radius: 12px; border: 1px solid rgba(239, 68, 68, 0.3);
+            cursor: pointer; font-size: 0.9rem; transition: 0.3s; width: 100%;
+        }
+        .cancel-btn:hover { background: rgba(239, 68, 68, 0.3); color: white; }
 
-        /* 🛠️ شريط الحالة العلوي (للكود المسجل) */
-        .top-status-bar {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 16px; padding: 15px; margin-bottom: 25px;
-            display: none; flex-direction: column; align-items: center; gap: 10px;
-        }
-        .code-display { color: var(--accent-gold); font-family: monospace; font-size: 1.2rem; letter-spacing: 2px; }
-        .clear-btn {
-            background: rgba(239, 68, 68, 0.2); color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: 0.3s;
-        }
-        .clear-btn:hover { background: rgba(239, 68, 68, 0.3); color: white; }
-
-        /* 👨‍💻 Footer المطور */
-        .developer-footer {
-            position: fixed; bottom: 20px; width: 100%;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 10;
-        }
-        .dev-badge {
-            background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(5px);
-            padding: 8px 20px; border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex; align-items: center; gap: 10px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
-        }
-        .dev-name { color: var(--accent-gold); font-weight: 900; letter-spacing: 1px; text-shadow: 0 0 10px rgba(251, 191, 36, 0.4); }
-        .dev-role { color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; }
+        /* رسائل الحالة */
+        #statusMessage { margin-bottom: 15px; padding: 10px; border-radius: 10px; font-size: 0.9rem; display: none; }
     </style>
 </head>
 <body>
@@ -175,17 +122,14 @@
         <div class="star" style="top:10%; left:20%; --duration:3s"></div>
         <div class="star" style="top:50%; left:80%; --duration:5s"></div>
         <div class="star" style="top:80%; left:30%; --duration:4s"></div>
-        <div class="star" style="top:30%; left:50%; --duration:6s"></div>
     </div>
 
     <div class="login-card">
         
-        <div id="topCodeStatus" class="top-status-bar"></div>
-
-        <div class="mb-6">
+        <div class="mb-4">
             <i class="fas fa-crown text-4xl text-yellow-400 mb-2 drop-shadow-lg"></i>
             <h2>FULL MARK</h2>
-            <p class="subtitle">بوابتك الأولى للتفوق الدراسي</p>
+            <p class="subtitle">مسارك نحو التفوق</p>
         </div>
 
         <div id="statusMessage"></div>
@@ -193,24 +137,34 @@
         <form id="loginForm">
             <div class="input-group">
                 <i class="fas fa-key icon"></i>
-                <input type="text" id="activationCode" placeholder="كود التفعيل" maxlength="15" autocomplete="off" required>
+                <input type="text" id="activationCode" placeholder="أدخل كود التفعيل" maxlength="15" autocomplete="off" required>
             </div>
-
             <button type="submit" id="loginBtn" class="login-btn">
-                دخول المنصة <i class="fas fa-rocket mr-2"></i>
+                تفعيل ودخول <i class="fas fa-rocket mr-2"></i>
             </button>
         </form>
-    </div>
-    
-    <footer class="developer-footer">
-        <div class="dev-badge">
-            <span class="dev-role">Developed By</span>
-            <span class="dev-name">ELGIZAWY</span>
+
+        <div id="autoLoginSection">
+            <div class="welcome-text">مرحباً بك مجدداً 👋</div>
+            <div class="code-badge" id="savedCodeDisplay">...</div>
+            
+            <div class="countdown-circle" id="timerDisplay">5</div>
+            
+            <p class="text-gray-400 text-xs mb-4">جاري الدخول التلقائي...</p>
+            
+            <button onclick="cancelAutoLogin()" class="cancel-btn">
+                إلغاء واستخدام كود آخر
+            </button>
         </div>
-    </footer>
+
+    </div>
+
+    <div style="position:fixed; bottom:15px; width:100%; text-align:center; opacity:0.7; font-size:0.8rem;">
+        <span style="color:#fbbf24; font-weight:bold;">ELGIZAWY</span> <span style="color:#94a3b8;">Developed By</span>
+    </div>
 
     <script>
-        // 🚨 إعدادات Firebase الخاصة بمنصة FULL MARK 2025
+        // 1. Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD1QB3qaFfkGYq0OWOEAr83V25NAPFwxzs",
             authDomain: "fullmark-2025.firebaseapp.com",
@@ -221,41 +175,32 @@
             appId: "1:963956202032:web:4df914457d79b75dee2bf5"
         };
         
-        // تهيئة الفايربيس
-        if (typeof firebase !== 'undefined' && !firebase.apps.length) {
-            firebase.initializeApp(firebaseConfig);
-        }
+        if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // عناصر الواجهة
-        const STATUS_MESSAGE = document.getElementById('statusMessage');
-        const LOGIN_FORM = document.getElementById('loginForm');
-        const LOGIN_BTN = document.getElementById('loginBtn');
-        const CODE_INPUT = document.getElementById('activationCode');
-        const CODE_STATUS = document.getElementById('topCodeStatus');
+        // 2. Elements
+        const loginForm = document.getElementById('loginForm');
+        const autoLoginSection = document.getElementById('autoLoginSection');
+        const timerDisplay = document.getElementById('timerDisplay');
+        const savedCodeDisplay = document.getElementById('savedCodeDisplay');
+        const statusMsg = document.getElementById('statusMessage');
+        let autoLoginTimer;
 
-        // دالة عرض الرسائل
+        // 3. Helper Functions
         function showMsg(text, type) {
-            STATUS_MESSAGE.textContent = text;
-            STATUS_MESSAGE.style.display = 'block';
-            STATUS_MESSAGE.className = ''; // reset
-            
-            if (type === 'success') {
-                STATUS_MESSAGE.style.background = 'rgba(16, 185, 129, 0.2)';
-                STATUS_MESSAGE.style.color = '#34d399';
-                STATUS_MESSAGE.style.border = '1px solid #10b981';
-            } else if (type === 'error') {
-                STATUS_MESSAGE.style.background = 'rgba(239, 68, 68, 0.2)';
-                STATUS_MESSAGE.style.color = '#f87171';
-                STATUS_MESSAGE.style.border = '1px solid #ef4444';
+            statusMsg.textContent = text;
+            statusMsg.style.display = 'block';
+            if(type === 'error') {
+                statusMsg.style.background = 'rgba(239, 68, 68, 0.2)';
+                statusMsg.style.color = '#f87171';
+                statusMsg.style.border = '1px solid #ef4444';
             } else {
-                STATUS_MESSAGE.style.background = 'rgba(59, 130, 246, 0.2)';
-                STATUS_MESSAGE.style.color = '#60a5fa';
-                STATUS_MESSAGE.style.border = '1px solid #3b82f6';
+                statusMsg.style.background = 'rgba(16, 185, 129, 0.2)';
+                statusMsg.style.color = '#34d399';
+                statusMsg.style.border = '1px solid #10b981';
             }
         }
 
-        // توليد معرف الجهاز
         function getDeviceID() {
             let did = localStorage.getItem('localDeviceId');
             if (!did) {
@@ -265,48 +210,70 @@
             return did;
         }
 
-        // حذف الكود
-        window.clearLocalCode = function() {
-            if(confirm('هل أنت متأكد من حذف الكود وتسجيل الخروج؟')) {
-                localStorage.removeItem('alpha_user_code');
-                localStorage.removeItem('is_active');
-                window.location.reload();
-            }
-        };
-
-        // التحقق التلقائي عند فتح الصفحة
+        // 4. Check for Saved Code (Auto Login Logic)
         const savedCode = localStorage.getItem('alpha_user_code');
+        
         if (savedCode) {
-            LOGIN_FORM.style.display = 'none';
-            CODE_STATUS.style.display = 'flex';
-            CODE_STATUS.innerHTML = `
-                <span style="color:#cbd5e1; font-size:0.9rem">أنت مسجل دخول بالكود:</span>
-                <span class="code-display">${savedCode}</span>
-                <div style="display:flex; gap:10px; margin-top:10px">
-                    <button class="login-btn" style="padding:8px 20px; font-size:0.9rem" onclick="window.location.href='subjects.html'">دخول مباشر</button>
-                    <button class="clear-btn" onclick="clearLocalCode()">خروج</button>
-                </div>
-            `;
+            // التبديل لواجهة الدخول التلقائي
+            loginForm.style.display = 'none';
+            autoLoginSection.style.display = 'block';
+            savedCodeDisplay.innerText = savedCode;
             
-            // تحقق صامت في الخلفية
-            checkCodeValidity(savedCode, true);
+            // بدء العداد التنازلي
+            let seconds = 5;
+            timerDisplay.innerText = seconds;
+            
+            // التحقق من صحة الكود في الخلفية أثناء العد
+            checkCode(savedCode, true).then(isValid => {
+                if(isValid) {
+                    autoLoginTimer = setInterval(() => {
+                        seconds--;
+                        timerDisplay.innerText = seconds;
+                        if (seconds <= 0) {
+                            clearInterval(autoLoginTimer);
+                            window.location.href = 'subjects.html'; // توجيه
+                        }
+                    }, 1000);
+                } else {
+                    // الكود غير صالح
+                    cancelAutoLogin();
+                }
+            });
+
         }
 
-        // منطق تسجيل الدخول
-        LOGIN_FORM.addEventListener('submit', (e) => {
+        function cancelAutoLogin() {
+            clearInterval(autoLoginTimer);
+            localStorage.removeItem('alpha_user_code');
+            autoLoginSection.style.display = 'none';
+            loginForm.style.display = 'block';
+        }
+
+        // 5. Manual Login Logic
+        loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const code = CODE_INPUT.value.trim();
-            if (code.length < 3) return showMsg('⚠️ يرجى كتابة كود صحيح', 'error');
-            checkCodeValidity(code, false);
+            const code = document.getElementById('activationCode').value.trim();
+            const btn = document.getElementById('loginBtn');
+            
+            if (code.length < 3) return showMsg('⚠️ اكتب كود صحيح', 'error');
+
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التحقق...';
+            
+            const isValid = await checkCode(code, false);
+            
+            if (isValid) {
+                localStorage.setItem('alpha_user_code', code);
+                showMsg('✅ تم التفعيل! جاري الدخول...', 'success');
+                setTimeout(() => window.location.href = 'subjects.html', 1500);
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = 'تفعيل ودخول <i class="fas fa-rocket mr-2"></i>';
+            }
         });
 
-        async function checkCodeValidity(code, isAuto) {
-            if (!isAuto) {
-                LOGIN_BTN.disabled = true;
-                LOGIN_BTN.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> جاري التحقق...';
-                showMsg('جاري الاتصال بالسيرفر...', 'pending');
-            }
-
+        // 6. Validation Function (Core Logic)
+        async function checkCode(code, isSilent) {
             try {
                 const snap = await db.ref('approvedStudents/' + code).once('value');
                 const data = snap.val();
@@ -314,53 +281,26 @@
                 const now = Date.now();
 
                 if (!data) throw new Error("الكود غير صحيح");
-                if (data.expiryDate && data.expiryDate <= now) throw new Error("انتهت صلاحية هذا الكود");
-                if (data.isBlocked) throw new Error("تم حظر هذا الكود، تواصل مع الدعم");
+                if (data.expiryDate && data.expiryDate <= now) throw new Error("انتهت صلاحية الكود");
+                if (data.isBlocked) throw new Error("تم حظر هذا الكود");
                 
-                // التحقق من الجهاز
                 if (data.deviceId && data.deviceId !== deviceId) {
-                    throw new Error("هذا الكود مفعل على جهاز آخر! لا يمكن الدخول.");
+                    throw new Error("هذا الكود مسجل على جهاز آخر");
                 }
 
-                // تفعيل الجهاز إذا كان أول مرة
+                // تسجيل الجهاز لو جديد
                 if (!data.deviceId) {
                     await db.ref('approvedStudents/' + code).update({ deviceId: deviceId });
                 }
 
-                // نجاح الدخول
-                localStorage.setItem('alpha_user_code', code);
-                
-                if (!isAuto) {
-                    showMsg('✅ تم التفعيل بنجاح! جاري الدخول...', 'success');
-                    setTimeout(() => window.location.href = 'subjects.html', 1500);
-                }
+                return true;
 
             } catch (err) {
-                showMsg('❌ ' + (err.message || 'حدث خطأ'), 'error');
-                if (isAuto) {
-                    // لو التحقق التلقائي فشل، نرجع الفورم
-                    localStorage.removeItem('alpha_user_code');
-                    CODE_STATUS.style.display = 'none';
-                    LOGIN_FORM.style.display = 'block';
-                }
-            } finally {
-                if (!isAuto) {
-                    LOGIN_BTN.disabled = false;
-                    LOGIN_BTN.innerHTML = 'دخول المنصة <i class="fas fa-rocket mr-2"></i>';
-                }
+                if (!isSilent) showMsg('❌ ' + err.message, 'error');
+                return false;
             }
-        }
-
-        // إنشاء شهب عشوائية
-        const body = document.querySelector('body');
-        for (let i = 0; i < 5; i++) {
-            const star = document.createElement('div');
-            star.className = 'shooting-star';
-            star.style.left = Math.random() * 100 + '%';
-            star.style.top = Math.random() * 50 + '%';
-            star.style.animationDelay = Math.random() * 5 + 's';
-            body.appendChild(star);
         }
     </script>
 </body>
-</html>
+    </html>
+    
