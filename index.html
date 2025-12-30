@@ -20,6 +20,7 @@
             --glass-bg: rgba(30, 41, 59, 0.6);
             --error-red: #ef4444;
             --success-green: #10b981;
+            --telegram-color: #229ED9;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Tajawal', sans-serif; }
@@ -50,6 +51,7 @@
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             position: relative; overflow: hidden;
             animation: floatUp 0.8s ease-out;
+            margin-bottom: 20px;
         }
         @keyframes floatUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -59,11 +61,21 @@
             background: linear-gradient(90deg, var(--primary-blue), var(--accent-gold), var(--primary-blue));
         }
 
+        /* 👑 الهيدر والجمل المتحركة */
         h2 {
             font-family: 'Cairo', sans-serif; margin-bottom: 5px; font-size: 2rem; font-weight: 900;
             background: linear-gradient(to right, #fff, #60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .subtitle { color: #94a3b8; font-size: 0.9rem; margin-bottom: 25px; font-weight: bold; }
+        
+        .typewriter-container {
+            min-height: 25px; margin-bottom: 25px;
+        }
+        .typewriter-text {
+            color: var(--accent-gold); font-size: 0.95rem; font-weight: bold;
+            border-left: 2px solid var(--primary-blue); padding-left: 5px;
+            animation: blink 0.7s infinite;
+        }
+        @keyframes blink { 50% { border-color: transparent; } }
 
         /* ⌨️ المدخلات */
         .input-group { position: relative; margin-bottom: 20px; }
@@ -86,61 +98,34 @@
         .login-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 20px -5px rgba(59, 130, 246, 0.5); }
         .login-btn:disabled { opacity: 0.7; cursor: wait; }
 
-        /* ⏱️ قسم الدخول التلقائي (المحسن) */
+        /* 📞 زر التواصل (تيليجرام) */
+        .contact-btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            background: rgba(34, 158, 217, 0.15); color: var(--telegram-color);
+            border: 1px solid rgba(34, 158, 217, 0.3);
+            padding: 10px 25px; border-radius: 50px;
+            font-weight: bold; text-decoration: none; font-size: 0.9rem;
+            transition: 0.3s; cursor: pointer;
+            box-shadow: 0 0 15px rgba(34, 158, 217, 0.1);
+        }
+        .contact-btn:hover {
+            background: var(--telegram-color); color: white;
+            box-shadow: 0 0 20px rgba(34, 158, 217, 0.4); transform: translateY(-2px);
+        }
+
+        /* ⏱️ قسم الدخول التلقائي */
         #autoLoginSection { display: none; }
         
-        /* حاوية الجمل التحفيزية */
-        .motivation-container {
-            margin-bottom: 20px;
-            min-height: 60px; /* ارتفاع ثابت لتجنب الاهتزاز */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .motivation-text {
-            font-size: 1.1rem;
-            font-weight: bold;
-            color: var(--accent-gold);
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
-        }
-        .motivation-text.active { opacity: 1; }
-
-        /* العداد الدائري الجديد */
-        .countdown-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 25px;
-        }
-
-        .progress-ring {
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-
-        .progress-ring__circle-bg {
-            stroke: rgba(251, 191, 36, 0.2);
-        }
-
+        .countdown-container { position: relative; width: 120px; height: 120px; margin: 0 auto 25px; }
+        .progress-ring { transform: rotate(-90deg); transform-origin: 50% 50%; }
+        .progress-ring__circle-bg { stroke: rgba(251, 191, 36, 0.2); }
         .progress-ring__circle {
-            stroke: var(--accent-gold);
-            stroke-dasharray: 326.7256; /* 2 * pi * r (r=52) */
-            stroke-dashoffset: 326.7256;
-            transition: stroke-dashoffset 1s linear;
-            filter: drop-shadow(0 0 8px var(--accent-gold));
+            stroke: var(--accent-gold); stroke-dasharray: 326.7256; stroke-dashoffset: 326.7256;
+            transition: stroke-dashoffset 1s linear; filter: drop-shadow(0 0 8px var(--accent-gold));
         }
-
         .timer-display {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 2.5rem;
-            font-weight: 900;
-            color: var(--accent-gold);
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 2.5rem; font-weight: 900; color: var(--accent-gold);
         }
         
         .welcome-text { color: #fff; font-size: 1.2rem; margin-bottom: 5px; font-weight: bold; }
@@ -171,10 +156,13 @@
 
     <div class="login-card">
         
-        <div class="mb-4">
+        <div class="mb-2">
             <i class="fas fa-crown text-4xl text-yellow-400 mb-2 drop-shadow-lg"></i>
             <h2>FULL MARK</h2>
-            <p class="subtitle">مسارك نحو التفوق</p>
+            
+            <div class="typewriter-container">
+                <span class="typewriter-text" id="typingText"></span>
+            </div>
         </div>
 
         <div id="statusMessage"></div>
@@ -192,10 +180,6 @@
         <div id="autoLoginSection">
             <div class="welcome-text">مرحباً بك مجدداً 👋</div>
             <div class="code-badge" id="savedCodeDisplay">...</div>
-
-            <div class="motivation-container">
-                <p class="motivation-text active" id="motivationText">...</p>
-            </div>
             
             <div class="countdown-container">
                 <svg class="progress-ring" width="120" height="120">
@@ -214,7 +198,12 @@
 
     </div>
 
-    <div style="position:fixed; bottom:15px; width:100%; text-align:center; opacity:0.7; font-size:0.8rem;">
+    <a href="https://t.me/giza_full_mark" target="_blank" class="contact-btn">
+        <i class="fab fa-telegram-plane text-xl"></i>
+        <span>تواصل للدعم الفني</span>
+    </a>
+
+    <div style="position:fixed; bottom:15px; width:100%; text-align:center; opacity:0.7; font-size:0.8rem; pointer-events:none;">
         <span style="color:#fbbf24; font-weight:bold;">ELGIZAWY</span> <span style="color:#94a3b8;">Developed By</span>
     </div>
 
@@ -233,37 +222,55 @@
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 2. Elements
+        // 2. Typing Effect (جمل ترحيبية متحركة)
+        const phrases = [
+            "مسارك نحو التفوق 🚀",
+            "أقوى منصة تعليمية 💪",
+            "حلمك يستاهل تعبك ✨",
+            "ابدأ رحلة النجاح الآن 🎓"
+        ];
+        let phraseIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typeSpeed = 100;
+        const deleteSpeed = 50;
+        const pauseTime = 2000;
+        const typingElement = document.getElementById("typingText");
+
+        function typeEffect() {
+            const currentPhrase = phrases[phraseIndex];
+            
+            if (isDeleting) {
+                typingElement.textContent = currentPhrase.substring(0, charIndex--);
+            } else {
+                typingElement.textContent = currentPhrase.substring(0, charIndex++);
+            }
+
+            let nextSpeed = isDeleting ? deleteSpeed : typeSpeed;
+
+            if (!isDeleting && charIndex === currentPhrase.length + 1) {
+                isDeleting = true;
+                nextSpeed = pauseTime;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                phraseIndex = (phraseIndex + 1) % phrases.length;
+            }
+
+            setTimeout(typeEffect, nextSpeed);
+        }
+        // بدء الكتابة عند التحميل
+        document.addEventListener('DOMContentLoaded', typeEffect);
+
+
+        // 3. Elements & Logic
         const loginForm = document.getElementById('loginForm');
         const autoLoginSection = document.getElementById('autoLoginSection');
         const timerDisplay = document.getElementById('timerDisplay');
         const savedCodeDisplay = document.getElementById('savedCodeDisplay');
         const statusMsg = document.getElementById('statusMessage');
-        const motivationText = document.getElementById('motivationText');
         const progressCircle = document.querySelector('.progress-ring__circle');
         let autoLoginTimer;
-        let motivationTimer;
 
-        // 3. Motivation Quotes
-        const quotes = [
-            "🚀 استعد للانطلاق نحو التفوق!",
-            "💪 كل دقيقة تذاكرها تقربك من حلمك.",
-            "🌟 أنت قادر على تحقيق المستحيل.",
-            "💎 اجعل هدفك دائماً الـ Full Mark.",
-            "🔥 المستقبل المشرق ينتظرك."
-        ];
-        let quoteIndex = 0;
-
-        function changeMotivation() {
-            motivationText.classList.remove('active');
-            setTimeout(() => {
-                motivationText.innerText = quotes[quoteIndex];
-                motivationText.classList.add('active');
-                quoteIndex = (quoteIndex + 1) % quotes.length;
-            }, 500); // Wait for fade out
-        }
-
-        // 4. Helper Functions
         function showMsg(text, type) {
             statusMsg.textContent = text;
             statusMsg.style.display = 'block';
@@ -293,55 +300,44 @@
             progressCircle.style.strokeDashoffset = offset;
         }
 
-        // 5. Check for Saved Code (Auto Login Logic)
+        // 4. Auto Login
         const savedCode = localStorage.getItem('alpha_user_code');
         
         if (savedCode) {
-            // التبديل لواجهة الدخول التلقائي
             loginForm.style.display = 'none';
             autoLoginSection.style.display = 'block';
             savedCodeDisplay.innerText = savedCode;
             
-            // بدء الجمل التحفيزية
-            changeMotivation();
-            motivationTimer = setInterval(changeMotivation, 2500); // Change every 2.5s
-
-            // بدء العداد التنازلي
             let seconds = 5;
             timerDisplay.innerText = seconds;
-            setProgress(100); // Start full
+            setProgress(100);
 
-            // التحقق من صحة الكود في الخلفية أثناء العد
             checkCode(savedCode, true).then(isValid => {
                 if(isValid) {
                     autoLoginTimer = setInterval(() => {
                         seconds--;
                         timerDisplay.innerText = seconds;
-                        setProgress((seconds / 5) * 100); // Update progress ring
+                        setProgress((seconds / 5) * 100);
                         
                         if (seconds <= 0) {
                             clearInterval(autoLoginTimer);
-                            clearInterval(motivationTimer);
-                            window.location.href = 'subjects.html'; // توجيه
+                            window.location.href = 'subjects.html';
                         }
                     }, 1000);
                 } else {
-                    // الكود غير صالح
                     cancelAutoLogin();
                 }
             });
-
         }
 
         function cancelAutoLogin() {
             clearInterval(autoLoginTimer);
-            clearInterval(motivationTimer);
             localStorage.removeItem('alpha_user_code');
             autoLoginSection.style.display = 'none';
             loginForm.style.display = 'block';
         }
 
-        // 6. Manual Login Logic
+        // 5. Manual Login
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const code = document.getElementById('activationCode').value.trim();
@@ -364,7 +360,7 @@
             }
         });
 
-        // 7. Validation Function (Core Logic)
+        // 6. Validation
         async function checkCode(code, isSilent) {
             try {
                 const snap = await db.ref('approvedStudents/' + code).once('value');
@@ -380,7 +376,6 @@
                     throw new Error("هذا الكود مسجل على جهاز آخر");
                 }
 
-                // تسجيل الجهاز لو جديد
                 if (!data.deviceId) {
                     await db.ref('approvedStudents/' + code).update({ deviceId: deviceId });
                 }
