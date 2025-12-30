@@ -178,19 +178,24 @@
     </div>
 
     <script>
-        // ✅ قائمة الملفات المحلية: لازم تسمي صورك بنفس الأسماء دي بالظبط وتحطها في فولدر اسمه images
+        // ✅ قاعدة البيانات المحدثة: تستخدم now more_images للصور التي قمت برفعها هناك
         const IMAGES_DB = {
+            // المواد الموجودة في مجلد images القديم
             "لغة عربية": "images/arabic.jpg",
-            "English": "images/english.jpg",
             "فيزياء": "images/physics.jpg",
             "كيمياء": "images/chemistry.jpg",
             "أحياء": "images/biology.jpg",
             "رياضيات": "images/math.jpg",
             "تاريخ": "images/history.jpg",
-            "جغرافيا": "images/geo.jpg",
-            "فرنساوي": "images/french.jpg",
-            "جيولوجيا": "images/geo_science.jpg",
-            "default": "images/default.jpg" // صورة احتياطية
+            "جيولوجيا": "images/physics.jpg", // صورة مؤقتة
+
+            // المواد الموجودة في مجلد more_images الجديد (بأسماء الملفات الدقيقة)
+            "english": "more_images/english (3).jpg",
+            "french": "more_images/french (1).jpg",
+            "geo": "more_images/geo (2).jpg",
+            "stats": "more_images/stats.jpg",
+
+            "default": "images/arabic.jpg"
         };
 
         const { createApp, ref, onMounted } = Vue;
@@ -201,18 +206,26 @@
                 const loading = ref(true);
                 const yid = ref(null);
 
+                // ✅ دالة البحث عن الصور تم تحديثها لتقرأ من المجلدين
                 const getImg = (n) => {
                     const name = n.toLowerCase();
+                    // بحث في مجلد images
                     if (name.includes('عربي') || name.includes('arabic')) return IMAGES_DB["لغة عربية"];
-                    if (name.includes('english') || name.includes('انجليزي')) return IMAGES_DB["English"];
                     if (name.includes('فيزياء') || name.includes('physics')) return IMAGES_DB["فيزياء"];
                     if (name.includes('كيمياء') || name.includes('chemistry')) return IMAGES_DB["كيمياء"];
                     if (name.includes('أحياء') || name.includes('biology')) return IMAGES_DB["أحياء"];
                     if (name.includes('رياضيات') || name.includes('math')) return IMAGES_DB["رياضيات"];
                     if (name.includes('تاريخ') || name.includes('history')) return IMAGES_DB["تاريخ"];
-                    if (name.includes('جغرافيا') || name.includes('geo')) return IMAGES_DB["جغرافيا"];
-                    if (name.includes('فرنساوي') || name.includes('french')) return IMAGES_DB["فرنساوي"];
+                    
+                    // بحث في مجلد more_images
+                    if (name.includes('english') || name.includes('انجليزي')) return IMAGES_DB["english"];
+                    if (name.includes('جغرافيا') || name.includes('geo')) return IMAGES_DB["geo"];
+                    if (name.includes('فرنساوي') || name.includes('french')) return IMAGES_DB["french"];
+                    if (name.includes('إحصاء') || name.includes('stats')) return IMAGES_DB["stats"];
+
+                    // الجيولوجيا (تستخدم صورة الفيزياء مؤقتاً لو مش موجودة)
                     if (name.includes('جيولوجيا')) return IMAGES_DB["جيولوجيا"];
+
                     return IMAGES_DB['default'];
                 };
 
@@ -273,5 +286,4 @@
         }).mount('#app');
     </script>
 </body>
-    </html>
-    
+</html>
