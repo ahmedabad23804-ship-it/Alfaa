@@ -22,102 +22,89 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* تعديلات Plyr */
+        /* تخصيص ألوان المشغل */
         :root { --plyr-color-main: #ff0000; }
-        .plyr__control--overlaid { display: none !important; }
-        
+
+        /* زر التشغيل الكبير */
+        .plyr__control--overlaid {
+            background: rgba(0, 0, 0, 0.5) !important;
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 50% !important;
+            padding: 25px !important;
+        }
+        .plyr__control--overlaid:hover { background: #ff0000 !important; border-color: #ff0000; }
+        .plyr__control--overlaid svg { width: 45px !important; height: 45px !important; }
+
+        /* شريط التحكم */
         .plyr__controls {
-            z-index: 1000 !important;
-            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
+            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent) !important;
             padding-bottom: 30px !important;
             padding-top: 60px !important;
+            z-index: 20 !important;
         }
 
-        /* طبقة التحكم */
-        .yt-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 50; 
-            display: flex; flex-direction: column; justify-content: space-between;
-            background: rgba(0, 0, 0, 0.4);
-            transition: opacity 0.3s ease;
+        /* ==================== العلامة المائية المتحركة (العشوائية) ==================== */
+        .watermark {
+            position: absolute;
+            font-size: 1.2rem; 
+            color: rgba(255, 255, 255, 0.15); /* شفاف جداً */
+            font-weight: 900; 
+            pointer-events: none; /* عشان اللمس يعدي من خلاله */
+            z-index: 9999; /* فوق كل حاجة */
+            white-space: nowrap;
+            text-shadow: 0 0 10px rgba(0,0,0,0.5);
+            /* الأنيميشن السحري */
+            animation: moveRandom 20s infinite alternate linear;
         }
 
-        /* الهيدر العلوي */
-        .yt-header {
+        /* حركة عشوائية تغطي الشاشة */
+        @keyframes moveRandom {
+            0%   { top: 5%;  left: 5%;  transform: rotate(-10deg); }
+            20%  { top: 80%; left: 20%; transform: rotate(5deg);   }
+            40%  { top: 20%; left: 80%; transform: rotate(-5deg);  }
+            60%  { top: 90%; left: 50%; transform: rotate(10deg);  }
+            80%  { top: 10%; left: 90%; transform: rotate(-10deg); }
+            100% { top: 50%; left: 5%;  transform: rotate(5deg);   }
+        }
+
+        /* هيدر الفيديو */
+        .video-header {
+            position: absolute; top: 0; left: 0; width: 100%;
             padding: 20px; display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            transition: 0.3s;
+            z-index: 30; pointer-events: none;
+            opacity: 0; transition: opacity 0.3s;
         }
+        .plyr--show-controls .video-header { opacity: 1; }
 
-        .header-btn {
-            color: white; font-size: 1.2rem; padding: 10px; border-radius: 50%;
-            background: rgba(255,255,255,0.1); width: 40px; height: 40px;
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; transition: 0.3s;
-        }
-        .header-btn:hover { background: rgba(255,255,255,0.3); }
-
-        .video-title {
-            color: white; font-size: 0.9rem; font-weight: bold;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 60%;
-        }
-
-        /* زر التشغيل في المنتصف */
-        .center-controls {
-            display: flex; align-items: center; justify-content: center;
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 100%;
-        }
-
-        .yt-play-big {
-            width: 80px; height: 80px; font-size: 2.5rem; border-radius: 50%;
-            background: rgba(0, 0, 0, 0.7); color: white;
-            border: 2px solid rgba(255,255,255,0.2);
+        .back-button {
+            pointer-events: auto; color: white; width: 40px; height: 40px;
+            background: rgba(255,255,255,0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; backdrop-filter: blur(5px);
-            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .yt-play-big:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
 
-        /* 💻 تحسينات للشاشات الكبيرة 💻 */
+        .video-title {
+            color: white; font-size: 1rem; font-weight: bold;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;
+        }
+
         @media (min-width: 768px) {
-            .yt-play-big { width: 100px; height: 100px; font-size: 3.5rem; }
-            .video-title { font-size: 1.3rem; max-width: 80%; }
-            .yt-header { padding: 30px; }
-            .yt-play-big:hover { background: #ff0000; color: white; border-color: #ff0000; transform: scale(1.1); }
+            .video-title { font-size: 1.4rem; }
+            .watermark { font-size: 1.5rem; }
         }
-
-        .watermark {
-            position: absolute; bottom: 80px; right: 20px;
-            font-size: 0.9rem; color: rgba(255,255,255,0.3);
-            font-weight: bold; pointer-events: none; z-index: 5;
-            animation: floatText 15s infinite alternate;
-        }
-        @keyframes floatText { from { transform: translateX(0); } to { transform: translateX(-30px); } }
-
-        .hidden-ui { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="video-wrapper" id="videoWrapper">
-        <div id="player-container" class="w-full h-full"></div>
-
-        <div id="ytOverlay" class="yt-overlay">
-            
-            <div class="yt-header">
-                <button onclick="history.back()" class="header-btn"><i class="fas fa-arrow-right"></i></button>
-                <h1 class="video-title" id="vidTitle">...</h1>
-            </div>
-
-            <div class="center-controls">
-                <button id="btnPlayPause" class="yt-play-big">
-                    <i class="fas fa-play ml-1" id="iconPlay"></i>
-                </button>
-            </div>
-
-            <div style="height: 80px;"></div>
+    <div class="video-wrapper">
+        
+        <div class="video-header">
+            <button onclick="history.back()" class="back-button"><i class="fas fa-arrow-right"></i></button>
+            <h1 class="video-title" id="vidTitle">...</h1>
         </div>
+
+        <div id="player-container" class="w-full h-full"></div>
 
         <div id="watermark" class="watermark">ID: ---</div>
     </div>
@@ -126,7 +113,13 @@
     <script>
         const userCode = checkAuth();
         if(!userCode) window.location.href = 'index.html';
-        document.getElementById('watermark').innerText = "ID: " + userCode;
+        
+        // عرض الكود والاسم (لو موجود) في العلامة المائية
+        const stdName = localStorage.getItem('studentName') || "";
+        // بنقسم الاسم عشان ميبقاش طويل أوي في العلامة المائية (أول اسمين بس)
+        const shortName = stdName.split(' ').slice(0, 2).join(' ');
+        
+        document.getElementById('watermark').innerText = userCode + (shortName ? " • " + shortName : "");
 
         const videoData = JSON.parse(localStorage.getItem('activeLecture'));
         if(!videoData) { alert("خطأ"); history.back(); }
@@ -144,70 +137,15 @@
         }
 
         const player = new Plyr('#player', {
-            controls: ['progress', 'current-time', 'duration', 'settings', 'fullscreen'],
-            hideControls: false,
-            clickToPlay: false,
-            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' }
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+            settings: ['quality', 'speed'],
+            speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
+            clickToPlay: true,
+            hideControls: true,
+            resetOnEnd: true,
         });
 
-        const overlay = document.getElementById('ytOverlay');
-        const iconPlay = document.getElementById('iconPlay');
-        const wrapper = document.getElementById('videoWrapper');
-        let uiTimer;
-
-        function showUI() {
-            overlay.classList.remove('hidden-ui');
-            player.toggleControls(true);
-            resetTimer();
-        }
-
-        function hideUI() {
-            if(player.paused) return;
-            overlay.classList.add('hidden-ui');
-            player.toggleControls(false);
-        }
-
-        function resetTimer() {
-            clearTimeout(uiTimer);
-            if(player.playing) {
-                uiTimer = setTimeout(hideUI, 3000);
-            }
-        }
-
-        function toggleUI() {
-            if(overlay.classList.contains('hidden-ui')) showUI();
-            else hideUI();
-        }
-
-        // زرار التشغيل الوحيد
-        document.getElementById('btnPlayPause').addEventListener('click', (e) => {
-            e.stopPropagation(); player.togglePlay();
-        });
-
-        // مزامنة الأيقونة
-        player.on('play', () => {
-            iconPlay.className = 'fas fa-pause';
-            resetTimer();
-        });
-        player.on('pause', () => {
-            iconPlay.className = 'fas fa-play ml-1';
-            showUI();
-        });
-
-        // دعم الماوس (للاب توب)
-        wrapper.addEventListener('mousemove', () => {
-            if(overlay.classList.contains('hidden-ui')) showUI();
-            else resetTimer();
-        });
-
-        // لمس الشاشة (للموبايل)
-        overlay.addEventListener('click', (e) => {
-            if(e.target === overlay || e.target.classList.contains('center-controls')) {
-                toggleUI();
-            }
-        });
-
-        showUI();
     </script>
 </body>
 </html>
