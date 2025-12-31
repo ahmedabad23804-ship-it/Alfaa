@@ -22,63 +22,61 @@
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* تخصيص ألوان المشغل */
+        /* تعديلات Plyr */
         :root { --plyr-color-main: #ff0000; }
+        
+        /* إخفاء زر تشغيل Plyr الأصلي عشان هنحط بتاعنا */
+        .plyr__control--overlaid { display: none !important; }
 
-        /* زر التشغيل الكبير */
-        .plyr__control--overlaid {
-            background: rgba(0, 0, 0, 0.5) !important;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 50% !important;
-            padding: 25px !important;
-        }
-        .plyr__control--overlaid:hover { background: #ff0000 !important; border-color: #ff0000; }
-        .plyr__control--overlaid svg { width: 45px !important; height: 45px !important; }
-
-        /* شريط التحكم */
+        /* شريط التحكم السفلي */
         .plyr__controls {
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent) !important;
+            z-index: 1000 !important; /* فوق كل حاجة */
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
             padding-bottom: 30px !important;
             padding-top: 60px !important;
-            z-index: 20 !important;
         }
 
-        /* ==================== العلامة المائية المتحركة (العشوائية) ==================== */
-        .watermark {
-            position: absolute;
-            font-size: 1.2rem; 
-            color: rgba(255, 255, 255, 0.15); /* شفاف جداً */
-            font-weight: 900; 
-            pointer-events: none; /* عشان اللمس يعدي من خلاله */
-            z-index: 9999; /* فوق كل حاجة */
-            white-space: nowrap;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-            /* الأنيميشن السحري */
-            animation: moveRandom 20s infinite alternate linear;
+        /* ==================== زر التشغيل اليدوي (المضمون) ==================== */
+        .manual-play-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 50; /* فوق الهيدر وفوق العلامة المائية */
+            pointer-events: none; /* عشان نسمح باللمس في الأماكن الفاضية */
         }
 
-        /* حركة عشوائية تغطي الشاشة */
-        @keyframes moveRandom {
-            0%   { top: 5%;  left: 5%;  transform: rotate(-10deg); }
-            20%  { top: 80%; left: 20%; transform: rotate(5deg);   }
-            40%  { top: 20%; left: 80%; transform: rotate(-5deg);  }
-            60%  { top: 90%; left: 50%; transform: rotate(10deg);  }
-            80%  { top: 10%; left: 90%; transform: rotate(-10deg); }
-            100% { top: 50%; left: 5%;  transform: rotate(5deg);   }
+        .big-play-btn {
+            pointer-events: auto; /* الزرار نفسه يستقبل اللمس */
+            width: 80px; height: 80px; 
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid rgba(255,255,255,0.3);
+            color: white; font-size: 2.5rem;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; backdrop-filter: blur(5px);
+            transition: all 0.2s ease;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
         }
+        
+        .big-play-btn:active { transform: scale(0.9); background: rgba(255,0,0,0.8); border-color: red; }
+        .big-play-btn:hover { background: rgba(255,0,0,0.8); border-color: red; }
+        
+        /* كلاس لإخفاء الزر لما الفيديو يشتغل */
+        .hidden-btn { opacity: 0; transform: scale(0.5); pointer-events: none; }
 
-        /* هيدر الفيديو */
+        /* ==================== الهيدر والعلامة المائية ==================== */
         .video-header {
             position: absolute; top: 0; left: 0; width: 100%;
             padding: 20px; display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            z-index: 30; pointer-events: none;
-            opacity: 0; transition: opacity 0.3s;
+            z-index: 40; /* تحت زر التشغيل */
+            pointer-events: none; /* شفاف للمس */
+            opacity: 0; transition: 0.3s;
         }
-        .plyr--show-controls .video-header { opacity: 1; }
+        .show-ui .video-header { opacity: 1; }
 
         .back-button {
-            pointer-events: auto; color: white; width: 40px; height: 40px;
+            pointer-events: auto; /* زر الرجوع شغال */
+            color: white; width: 40px; height: 40px; font-size: 1.2rem;
             background: rgba(255,255,255,0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; backdrop-filter: blur(5px);
@@ -89,19 +87,33 @@
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;
         }
 
+        .watermark {
+            position: absolute; bottom: 80px; right: 20px;
+            font-size: 0.9rem; color: rgba(255,255,255,0.3);
+            font-weight: bold; pointer-events: none; z-index: 5;
+            animation: floatText 15s infinite alternate;
+        }
+        @keyframes floatText { from { transform: translateX(0); } to { transform: translateX(-30px); } }
+
+        /* الشاشات الكبيرة */
         @media (min-width: 768px) {
+            .big-play-btn { width: 100px; height: 100px; font-size: 3.5rem; }
             .video-title { font-size: 1.4rem; }
-            .watermark { font-size: 1.5rem; }
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="video-wrapper">
+    <div class="video-wrapper" id="videoWrapper">
         
         <div class="video-header">
             <button onclick="history.back()" class="back-button"><i class="fas fa-arrow-right"></i></button>
             <h1 class="video-title" id="vidTitle">...</h1>
+        </div>
+
+        <div class="manual-play-overlay">
+            <button id="customPlayBtn" class="big-play-btn">
+                <i class="fas fa-play ml-2"></i> </button>
         </div>
 
         <div id="player-container" class="w-full h-full"></div>
@@ -113,13 +125,7 @@
     <script>
         const userCode = checkAuth();
         if(!userCode) window.location.href = 'index.html';
-        
-        // عرض الكود والاسم (لو موجود) في العلامة المائية
-        const stdName = localStorage.getItem('studentName') || "";
-        // بنقسم الاسم عشان ميبقاش طويل أوي في العلامة المائية (أول اسمين بس)
-        const shortName = stdName.split(' ').slice(0, 2).join(' ');
-        
-        document.getElementById('watermark').innerText = userCode + (shortName ? " • " + shortName : "");
+        document.getElementById('watermark').innerText = "ID: " + userCode;
 
         const videoData = JSON.parse(localStorage.getItem('activeLecture'));
         if(!videoData) { alert("خطأ"); history.back(); }
@@ -137,13 +143,52 @@
         }
 
         const player = new Plyr('#player', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'mute', 'volume', 'settings', 'fullscreen'],
+            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'settings', 'fullscreen'],
             settings: ['quality', 'speed'],
             speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
             fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
-            clickToPlay: true,
+            clickToPlay: true, 
             hideControls: true,
             resetOnEnd: true,
+        });
+
+        // --- منطق زر التشغيل اليدوي ---
+        const customBtn = document.getElementById('customPlayBtn');
+        const wrapper = document.getElementById('videoWrapper');
+
+        // لما تدوس على الزرار الكبير
+        customBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); // عشان الضغطة متوصلش لحاجة تانية
+            player.togglePlay();
+        });
+
+        // مزامنة الزرار مع حالة الفيديو
+        player.on('play', () => {
+            customBtn.classList.add('hidden-btn'); // اخفي الزرار
+        });
+
+        player.on('pause', () => {
+            customBtn.classList.remove('hidden-btn'); // اظهر الزرار
+            wrapper.classList.add('show-ui'); // اظهر الهيدر
+        });
+
+        // التحكم في ظهور الهيدر مع تحكمات المشغل
+        player.on('controlsshown', () => wrapper.classList.add('show-ui'));
+        player.on('controlshidden', () => {
+            if(player.playing) wrapper.classList.remove('show-ui');
+        });
+
+        // ضغطة على الشاشة لإظهار التحكم والزرار
+        wrapper.addEventListener('click', (e) => {
+            // لو الضغط مش على التحكمات
+            if(!e.target.closest('.plyr__controls') && !e.target.closest('.back-button')) {
+                if(player.playing) {
+                    // لو شغال، الضغطة هتوقفه (بسبب clickToPlay) وتظهر الزرار
+                    // Plyr هيعمل pause لوحده، والحدث pause هيظهر الزرار
+                } else {
+                    // لو واقف، الزرار موجود أصلاً
+                }
+            }
         });
 
     </script>
