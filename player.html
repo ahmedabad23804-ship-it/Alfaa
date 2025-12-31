@@ -6,7 +6,6 @@
     <title>FULL MARK Player</title>
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -16,170 +15,147 @@
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@700;900&display=swap" rel="stylesheet">
     
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; font-family: 'Tajawal', sans-serif; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body, html { margin: 0; padding: 0; height: 100%; background: #000; overflow: hidden; font-family: 'Tajawal', sans-serif; }
         
         .video-wrapper {
             width: 100%; height: 100vh; position: relative; background: #000;
             display: flex; align-items: center; justify-content: center;
         }
 
-        /* ==================== تعديل شكل زرار التشغيل الأصلي ==================== */
-        :root { --plyr-color-main: #ff0000; } /* اللون الأحمر */
-
-        /* الزرار الكبير في النص */
-        .plyr__control--overlaid {
-            background: rgba(0, 0, 0, 0.7) !important; /* خلفية سوداء شفافة */
-            color: white !important;
-            border: 2px solid rgba(255, 255, 255, 0.5); /* إطار أبيض */
-            border-radius: 50% !important;
-            padding: 30px !important; /* تكبير الزر */
-            transition: 0.3s !important;
-        }
+        /* تنسيق زر التشغيل الأحمر */
+        :root { --plyr-color-main: #ff0000; }
         
-        /* لما الماوس ييجي عليه */
+        /* زر التشغيل الكبير */
+        .plyr__control--overlaid {
+            background: rgba(0, 0, 0, 0.7) !important;
+            color: white !important;
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 30px !important;
+            border-radius: 50% !important;
+            display: flex !important; /* ضمان ظهوره */
+        }
         .plyr__control--overlaid:hover {
-            background: #ff0000 !important; /* يحمر */
-            border-color: #ff0000 !important;
-            transform: scale(1.1);
+            background: #ff0000 !important; border-color: #ff0000 !important;
         }
+        .plyr__control--overlaid svg { width: 45px !important; height: 45px !important; }
 
-        /* تكبير أيقونة المثلث جوه الزرار */
-        .plyr__control--overlaid svg {
-            width: 50px !important; height: 50px !important;
-            fill: white !important;
-        }
-
-        /* شريط التحكم السفلي */
-        .plyr__controls {
-            background: linear-gradient(to top, rgba(0,0,0,0.95), transparent) !important;
-            padding-bottom: 40px !important;
-            padding-top: 80px !important;
-            z-index: 50 !important;
-        }
-
-        /* ==================== الهيدر والعلامة المائية ==================== */
+        /* الهيدر */
         .video-header {
             position: absolute; top: 0; left: 0; width: 100%;
             padding: 20px; display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
-            z-index: 60; 
-            pointer-events: none; /* عشان اللمس يعدي */
+            z-index: 50; pointer-events: none;
             opacity: 0; transition: 0.3s;
         }
-        /* يظهر بس لما تلمس الشاشة */
         .plyr--show-controls .video-header { opacity: 1; }
 
         .back-button {
-            pointer-events: auto; /* الزرار ده بس اللي شغال */
-            color: white; width: 45px; height: 45px; font-size: 1.2rem;
+            pointer-events: auto; color: white; width: 40px; height: 40px;
             background: rgba(255,255,255,0.15); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; backdrop-filter: blur(10px); transition: 0.3s;
+            cursor: pointer; backdrop-filter: blur(5px);
         }
-        .back-button:hover { background: rgba(255,255,255,0.3); }
 
         .video-title {
-            color: white; font-size: 1.1rem; font-weight: bold;
+            color: white; font-size: 1rem; font-weight: bold;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 70%;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
         }
 
-        /* العلامة المائية المتحركة (الحماية الحقيقية) */
+        /* العلامة المائية */
         .watermark {
-            position: absolute; font-size: 1.1rem; 
-            color: rgba(255, 255, 255, 0.2); 
-            font-weight: 900; pointer-events: none; z-index: 100;
-            white-space: nowrap;
-            text-shadow: 0 0 5px rgba(0,0,0,0.5);
-            animation: moveRandom 25s infinite alternate linear;
+            position: absolute; bottom: 80px; right: 20px;
+            font-size: 1rem; color: rgba(255,255,255,0.25);
+            font-weight: 900; pointer-events: none; z-index: 40;
+            animation: moveRandom 20s infinite alternate linear;
         }
-
         @keyframes moveRandom {
-            0%   { top: 10%; left: 10%; }
-            25%  { top: 80%; left: 20%; }
-            50%  { top: 50%; left: 80%; }
-            75%  { top: 20%; left: 50%; }
-            100% { top: 70%; left: 90%; }
-        }
-
-        @media (min-width: 768px) {
-            .video-title { font-size: 1.5rem; }
-            .plyr__control--overlaid { padding: 40px !important; }
-            .plyr__control--overlaid svg { width: 60px !important; height: 60px !important; }
+            0% { top: 10%; left: 10%; } 100% { top: 80%; left: 80%; }
         }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="video-wrapper" id="videoWrapper">
-        
+    <div class="video-wrapper">
         <div class="video-header">
             <button onclick="history.back()" class="back-button"><i class="fas fa-arrow-right"></i></button>
-            <h1 class="video-title" id="vidTitle">...</h1>
+            <h1 class="video-title" id="vidTitle">جار التحميل...</h1>
         </div>
 
-        <div id="player-container" class="w-full h-full">
-            <video id="player" playsinline controls class="w-full h-full"></video>
-        </div>
+        <video id="player" playsinline controls class="w-full h-full" style="max-height: 100vh;">
+            </video>
 
         <div id="watermark" class="watermark">ID: ---</div>
     </div>
 
     <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
     <script>
-        // 1. الحماية والتحقق
+        // 1. التحقق
         const userCode = checkAuth();
         if(!userCode) window.location.href = 'index.html';
         
-        // عرض الكود والاسم في العلامة المائية
         const stdName = localStorage.getItem('studentName') || "";
-        const shortName = stdName.split(' ').slice(0, 2).join(' '); // أول اسمين بس
+        const shortName = stdName.split(' ').slice(0, 2).join(' ');
         document.getElementById('watermark').innerText = userCode + (shortName ? " • " + shortName : "");
 
-        // 2. تحميل البيانات
-        const videoData = JSON.parse(localStorage.getItem('activeLecture'));
-        if(!videoData) { alert("خطأ في تشغيل الفيديو"); history.back(); }
-        document.getElementById('vidTitle').innerText = videoData.video_name || videoData.name || "محاضرة";
+        // 2. استرجاع البيانات
+        let videoData;
+        try {
+            videoData = JSON.parse(localStorage.getItem('activeLecture'));
+        } catch(e) { console.error(e); }
 
-        const video = document.getElementById('player');
+        if(!videoData) { alert("بيانات الفيديو غير موجودة"); history.back(); }
+
+        const title = videoData.video_name || videoData.name || videoData.title || "مشاهدة الفيديو";
+        document.getElementById('vidTitle').innerText = title;
+
         let src = videoData.stream_url || videoData.video_url || "";
         src = src.trim();
 
-        // 3. تشغيل ذكي (يوتيوب / HLS / MP4)
-        if(src.includes('youtube') || src.includes('youtu.be')) {
-            let vidId = src.split('v=')[1]?.split('&')[0] || src.split('youtu.be/')[1]?.split('?')[0];
-            document.getElementById('player-container').innerHTML = `<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="${vidId}"></div>`;
-            initPlyr('#player');
-        } 
-        else if (Hls.isSupported() && (src.includes('.m3u8') || !src.includes('.mp4'))) {
-            const hls = new Hls();
-            hls.loadSource(src);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, function() {
-                initPlyr(video);
+        // 3. تركيب الفيديو (تركيز على الملفات)
+        const videoElement = document.getElementById('player');
+        
+        // التحقق من الرابط
+        if (!src) {
+            alert("رابط الفيديو فارغ!");
+        } else {
+            // وضع الرابط مباشرة
+            videoElement.src = src;
+            
+            // إضافة مستمع للأخطاء (عشان لو الرابط بايظ نعرف)
+            videoElement.addEventListener('error', function(e) {
+                console.error("Error loading video:", e);
+                alert("تعذر تشغيل الملف. تأكد من اتصالك بالإنترنت أو أن الرابط صحيح.");
             });
-        } 
-        else {
-            video.src = src;
-            initPlyr(video);
         }
 
-        // دالة تعريف المشغل
-        function initPlyr(target) {
-            const player = new Plyr(target, {
-                controls: [
-                    'play-large', // ✅ ده الزرار الكبير اللي في النص
-                    'play', 'progress', 'current-time', 'duration', 
-                    'mute', 'volume', 'settings', 'fullscreen'
-                ],
-                settings: ['quality', 'speed'],
-                speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
-                fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
-                clickToPlay: true, 
-                hideControls: true,
-                resetOnEnd: true,
-            });
-        }
+        // 4. تشغيل Plyr
+        const player = new Plyr(videoElement, {
+            controls: [
+                'play-large', // الزر الكبير
+                'play', 
+                'progress', 
+                'current-time', 
+                'duration', 
+                'mute', 
+                'volume', 
+                'settings', 
+                'fullscreen'
+            ],
+            settings: ['quality', 'speed'],
+            speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
+            clickToPlay: true,
+            hideControls: true,
+            resetOnEnd: true,
+        });
+
+        // إصلاح مشكلة الحجم
+        player.on('ready', () => {
+            // التأكد إن الفيديو واخد راحته في الشاشة
+            document.querySelector('.plyr').style.height = '100%';
+            document.querySelector('.plyr').style.width = '100%';
+        });
+
     </script>
 </body>
 </html>
