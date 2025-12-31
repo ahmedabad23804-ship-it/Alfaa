@@ -6,6 +6,8 @@
     <title>FULL MARK Player</title>
     
     <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <script src="https://cdn.tailwindcss.com"></script>
@@ -25,28 +27,27 @@
         /* تعديلات Plyr */
         :root { --plyr-color-main: #ff0000; }
         
-        /* إخفاء زر تشغيل Plyr الأصلي عشان هنحط بتاعنا */
+        /* إخفاء زر تشغيل Plyr الأصلي */
         .plyr__control--overlaid { display: none !important; }
 
         /* شريط التحكم السفلي */
         .plyr__controls {
-            z-index: 1000 !important; /* فوق كل حاجة */
+            z-index: 1000 !important;
             background: linear-gradient(to top, rgba(0,0,0,0.9), transparent) !important;
             padding-bottom: 30px !important;
             padding-top: 60px !important;
         }
 
-        /* ==================== زر التشغيل اليدوي (المضمون) ==================== */
+        /* زر التشغيل اليدوي */
         .manual-play-overlay {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             display: flex; align-items: center; justify-content: center;
-            z-index: 50; /* فوق الهيدر وفوق العلامة المائية */
-            pointer-events: none; /* عشان نسمح باللمس في الأماكن الفاضية */
+            z-index: 50; 
+            pointer-events: none;
         }
 
         .big-play-btn {
-            pointer-events: auto; /* الزرار نفسه يستقبل اللمس */
-            width: 80px; height: 80px; 
+            pointer-events: auto; width: 80px; height: 80px; 
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.6);
             border: 2px solid rgba(255,255,255,0.3);
@@ -60,23 +61,19 @@
         .big-play-btn:active { transform: scale(0.9); background: rgba(255,0,0,0.8); border-color: red; }
         .big-play-btn:hover { background: rgba(255,0,0,0.8); border-color: red; }
         
-        /* كلاس لإخفاء الزر لما الفيديو يشتغل */
         .hidden-btn { opacity: 0; transform: scale(0.5); pointer-events: none; }
 
-        /* ==================== الهيدر والعلامة المائية ==================== */
+        /* الهيدر والعلامة المائية */
         .video-header {
             position: absolute; top: 0; left: 0; width: 100%;
             padding: 20px; display: flex; align-items: center; gap: 15px;
             background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            z-index: 40; /* تحت زر التشغيل */
-            pointer-events: none; /* شفاف للمس */
-            opacity: 0; transition: 0.3s;
+            z-index: 40; pointer-events: none; opacity: 0; transition: 0.3s;
         }
         .show-ui .video-header { opacity: 1; }
 
         .back-button {
-            pointer-events: auto; /* زر الرجوع شغال */
-            color: white; width: 40px; height: 40px; font-size: 1.2rem;
+            pointer-events: auto; color: white; width: 40px; height: 40px; font-size: 1.2rem;
             background: rgba(255,255,255,0.1); border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             cursor: pointer; backdrop-filter: blur(5px);
@@ -95,7 +92,6 @@
         }
         @keyframes floatText { from { transform: translateX(0); } to { transform: translateX(-30px); } }
 
-        /* الشاشات الكبيرة */
         @media (min-width: 768px) {
             .big-play-btn { width: 100px; height: 100px; font-size: 3.5rem; }
             .video-title { font-size: 1.4rem; }
@@ -105,7 +101,6 @@
 <body oncontextmenu="return false;">
 
     <div class="video-wrapper" id="videoWrapper">
-        
         <div class="video-header">
             <button onclick="history.back()" class="back-button"><i class="fas fa-arrow-right"></i></button>
             <h1 class="video-title" id="vidTitle">...</h1>
@@ -113,10 +108,13 @@
 
         <div class="manual-play-overlay">
             <button id="customPlayBtn" class="big-play-btn">
-                <i class="fas fa-play ml-2"></i> </button>
+                <i class="fas fa-play ml-2"></i>
+            </button>
         </div>
 
-        <div id="player-container" class="w-full h-full"></div>
+        <div id="player-container" class="w-full h-full">
+            <video id="player" playsinline controls class="w-full h-full"></video>
+        </div>
 
         <div id="watermark" class="watermark">ID: ---</div>
     </div>
@@ -131,65 +129,77 @@
         if(!videoData) { alert("خطأ"); history.back(); }
         document.getElementById('vidTitle').innerText = videoData.video_name || videoData.name || "مشاهدة الفيديو";
 
-        const container = document.getElementById('player-container');
+        const video = document.getElementById('player');
         let src = videoData.stream_url || videoData.video_url || "";
         src = src.trim();
 
+        // 4. المنطق الذكي لتشغيل جميع الصيغ
         if(src.includes('youtube') || src.includes('youtu.be')) {
+            // لو يوتيوب
             let vidId = src.split('v=')[1]?.split('&')[0] || src.split('youtu.be/')[1]?.split('?')[0];
-            container.innerHTML = `<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="${vidId}"></div>`;
-        } else {
-            container.innerHTML = `<video id="player" playsinline controls><source src="${src}" type="video/mp4" /></video>`;
+            document.getElementById('player-container').innerHTML = `<div id="player" data-plyr-provider="youtube" data-plyr-embed-id="${vidId}"></div>`;
+            initPlyr('#player');
+        } 
+        else if (Hls.isSupported() && (src.includes('.m3u8') || !src.includes('.mp4'))) {
+            // لو HLS أو رابط غريب (محتمل يكون بث)
+            const hls = new Hls();
+            hls.loadSource(src);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                initPlyr(video);
+            });
+        } 
+        else {
+            // لو MP4 مباشر
+            video.src = src;
+            initPlyr(video);
         }
 
-        const player = new Plyr('#player', {
-            controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'settings', 'fullscreen'],
-            settings: ['quality', 'speed'],
-            speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
-            fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
-            clickToPlay: true, 
-            hideControls: true,
-            resetOnEnd: true,
-        });
+        // دالة تهيئة المشغل
+        let player;
+        function initPlyr(target) {
+            player = new Plyr(target, {
+                controls: ['play-large', 'play', 'progress', 'current-time', 'duration', 'settings', 'fullscreen'],
+                settings: ['quality', 'speed'],
+                speed: { selected: 1, options: [0.75, 1, 1.25, 1.5, 2] },
+                fullscreen: { enabled: true, fallback: true, iosNative: 'auto' },
+                clickToPlay: true, 
+                hideControls: true,
+                resetOnEnd: true,
+            });
 
-        // --- منطق زر التشغيل اليدوي ---
-        const customBtn = document.getElementById('customPlayBtn');
-        const wrapper = document.getElementById('videoWrapper');
+            setupCustomControls();
+        }
 
-        // لما تدوس على الزرار الكبير
-        customBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); // عشان الضغطة متوصلش لحاجة تانية
-            player.togglePlay();
-        });
+        // منطق التحكم اليدوي
+        function setupCustomControls() {
+            const customBtn = document.getElementById('customPlayBtn');
+            const wrapper = document.getElementById('videoWrapper');
 
-        // مزامنة الزرار مع حالة الفيديو
-        player.on('play', () => {
-            customBtn.classList.add('hidden-btn'); // اخفي الزرار
-        });
+            customBtn.addEventListener('click', (e) => {
+                e.stopPropagation(); player.togglePlay();
+            });
 
-        player.on('pause', () => {
-            customBtn.classList.remove('hidden-btn'); // اظهر الزرار
-            wrapper.classList.add('show-ui'); // اظهر الهيدر
-        });
+            player.on('play', () => {
+                customBtn.classList.add('hidden-btn');
+            });
 
-        // التحكم في ظهور الهيدر مع تحكمات المشغل
-        player.on('controlsshown', () => wrapper.classList.add('show-ui'));
-        player.on('controlshidden', () => {
-            if(player.playing) wrapper.classList.remove('show-ui');
-        });
+            player.on('pause', () => {
+                customBtn.classList.remove('hidden-btn');
+                wrapper.classList.add('show-ui');
+            });
 
-        // ضغطة على الشاشة لإظهار التحكم والزرار
-        wrapper.addEventListener('click', (e) => {
-            // لو الضغط مش على التحكمات
-            if(!e.target.closest('.plyr__controls') && !e.target.closest('.back-button')) {
-                if(player.playing) {
-                    // لو شغال، الضغطة هتوقفه (بسبب clickToPlay) وتظهر الزرار
-                    // Plyr هيعمل pause لوحده، والحدث pause هيظهر الزرار
-                } else {
-                    // لو واقف، الزرار موجود أصلاً
+            player.on('controlsshown', () => wrapper.classList.add('show-ui'));
+            player.on('controlshidden', () => {
+                if(player.playing) wrapper.classList.remove('show-ui');
+            });
+
+            wrapper.addEventListener('click', (e) => {
+                if(!e.target.closest('.plyr__controls') && !e.target.closest('.back-button')) {
+                    if(player.playing) { /* Plyr handles pause */ }
                 }
-            }
-        });
+            });
+        }
 
     </script>
 </body>
